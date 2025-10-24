@@ -1,8 +1,9 @@
 base_path: ./ # working dir
 # environments
-rapids-env: rapids-env/bin/python
-pytorch-env: pytorch-env/bin/python
+rapids-env: /usr/bin/python3
+pytorch-env: /usr/bin/python3
 # artifacts paths
+data_path: /kaggle/input/cafa-6-protein-function-prediction # path to input data
 embeds_path: embeds # path to embeddings 
 models_path: models # store the models
 helpers_path: helpers # store reformated datasets

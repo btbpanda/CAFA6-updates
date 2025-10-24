@@ -13,7 +13,11 @@ parser.add_argument('-c', '--config-path', type=str)
 def create_train(path, output):
     df = []
     d_row, seq = None, None
-    tax = pd.read_csv(os.path.join(path, 'train_taxonomy.tsv'), sep='\t', index_col='EntryID').squeeze()
+    tax = pd.read_csv(
+        os.path.join(path, 'train_taxonomy.tsv'),
+        sep='\t', names=['EntryID', 'taxonomyID'],
+        index_col='EntryID'
+    ).squeeze()
 
     with open(os.path.join(path, 'train_sequences.fasta')) as f:
 
@@ -101,8 +105,8 @@ if __name__ == '__main__':
     with open(args.config_path) as f:
         config = yaml.safe_load(f)
     helpers_path = os.path.join(config['base_path'], config['helpers_path'])
-    train_path = os.path.join(config['base_path'], 'Train/')
-    test_path = os.path.join(config['base_path'], 'Test (Targets)/')
+    train_path = os.path.join(config['data_path'], 'Train/')
+    test_path = os.path.join(config['data_path'], 'Test/')
     output_path = os.path.join(helpers_path, 'fasta')
 
     os.makedirs(output_path, exist_ok=True)
