@@ -73,6 +73,8 @@ if __name__ == '__main__':
         ASPECT_CAFA5 if args.cafa == 5 else ASPECT_CAFA6
     )
 
+    print(terms)
+
     vec_train_protein_ids = pd.read_feather(
         os.path.join(config['base_path'], config['helpers_path'], 'fasta/train_seq.feather'),
         columns=['EntryID'],
