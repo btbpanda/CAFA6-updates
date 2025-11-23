@@ -91,6 +91,8 @@ if __name__ == '__main__':
         num = Series(np.arange(idx.shape[0]), index=idx)
         trm = terms.loc[idx]
 
+        print(trm)
+
         # reformat targets
         for ont in ontologies:
 
