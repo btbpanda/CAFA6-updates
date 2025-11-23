@@ -23,6 +23,11 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-c', '--config-path', type=str)
 parser.add_argument('-b', '--batch-size', type=int)
 parser.add_argument('-p', '--propagate', type=bool, default=False)
+parser.add_argument('-cf', '--cafa', type=int, default=5)
+
+ASPECT_CAFA5 = {'BPO': 'biological_process', 'MFO': 'molecular_function', 'CCO': 'cellular_component'}
+ASPECT_CAFA6 = {'P': 'biological_process', 'F': 'molecular_function', 'C': 'cellular_component'}
+
 
 
 @njit
@@ -65,7 +70,7 @@ if __name__ == '__main__':
 
     terms = trainTerms.set_index('EntryID')
     terms['namespace'] = terms['aspect'].map(
-        {'BPO': 'biological_process', 'MFO': 'molecular_function', 'CCO': 'cellular_component'}
+        ASPECT_CAFA5 if args.cafa == 5 else ASPECT_CAFA6
     )
 
     vec_train_protein_ids = pd.read_feather(
