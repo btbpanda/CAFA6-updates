@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
             trm_ont = trm.query(f"namespace == '{ont.namespace}'").copy()
 
-            print(trm)
+            print(trm_ont)
 
             trm_ont['id'] = trm_ont['term'].map(get_funcs_mapper(ont)).values
             trm_ont['n'] = num.loc[trm_ont.index].values
