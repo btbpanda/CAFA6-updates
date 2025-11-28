@@ -78,7 +78,7 @@ if __name__ == '__main__':
     kaggle_codes = set('IDA IMP TAS IPI IEP IGI IC EXP HTP HDA HMP HGI HEP'.split())
 
     data[(data['EntryID']).isin(test_idx - train_idx) & (data['source'].isin(kaggle_codes))].to_csv(
-        f'{path}/test_leak_no_dup.tsv', sep='\t', index=False)
+        f'{path}/test_leak_no_dup.tsv', st)
     data[(data['EntryID']).isin(train_idx) & (~data['source'].isin(kaggle_codes))].to_csv(
         f'{path}/train_no_kaggle.tsv', sep='\t', index=False)
     data[(data['EntryID']).isin(test_idx) & (~data['source'].isin(kaggle_codes))].to_csv(

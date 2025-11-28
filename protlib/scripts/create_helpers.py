@@ -20,7 +20,13 @@ except Exception:
     obo_parser, Graph, ia_parser, get_funcs_mapper = None, None, None, None
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-c', '--config-path', type=str)
+# parser.add_argument('-c', '--config-path', type=str)
+parser.add_argument('-o', '--output', type=str)
+parser.add_argument('-t', '--terms', type=str)
+parser.add_argument('-g', '--graph', type=str)
+parser.add_argument('-i', '--ia', type=str)
+parser.add_argument('-s', '--seq', type=str)
+
 parser.add_argument('-b', '--batch-size', type=int)
 parser.add_argument('-p', '--propagate', type=bool, default=False)
 parser.add_argument('-cf', '--cafa', type=int, default=5)
@@ -60,13 +66,15 @@ def propagate_target(mat, G):
 if __name__ == '__main__':
     args = parser.parse_args()
 
-    with open(args.config_path) as f:
-        config = yaml.safe_load(f)
+    # with open(args.config_path) as f:
+    #     config = yaml.safe_load(f)
 
-    path = os.path.join(config['base_path'], config['helpers_path'], 'real_targets')
+    # path = os.path.join(config['base_path'], config['helpers_path'], 'real_targets')
+    path = args.output
     os.makedirs(path, exist_ok=True)
 
-    trainTerms = pd.read_csv(os.path.join(config['base_path'], 'Train/train_terms.tsv'), sep='\t')
+    # trainTerms = pd.read_csv(os.path.join(config['base_path'], 'Train/train_terms.tsv'), sep='\t')
+    trainTerms = pd.read_csv(args.terms, sep='\t')
 
     terms = trainTerms.set_index('EntryID')
     terms['namespace'] = terms['aspect'].map(
@@ -76,13 +84,16 @@ if __name__ == '__main__':
     print(terms)
 
     vec_train_protein_ids = pd.read_feather(
+        # os.path.join(config['base_path'], config['helpers_path'], 'fasta/train_seq.feather'),
         os.path.join(config['base_path'], config['helpers_path'], 'fasta/train_seq.feather'),
         columns=['EntryID'],
     )['EntryID'].values
 
-    ia_dict = ia_parser(os.path.join(config['base_path'], 'IA.txt'))
+    # ia_dict = ia_parser(os.path.join(config['base_path'], 'IA.txt'))
+    ia_dict = ia_parser(args.ia)
     ontologies = []
-    for ns, terms_dict in obo_parser(os.path.join(config['base_path'], 'Train/go-basic.obo')).items():
+    # for ns, terms_dict in obo_parser(os.path.join(config['base_path'], 'Train/go-basic.obo')).items():
+    for ns, terms_dict in obo_parser(args.graph).items():
         ontologies.append(Graph(ns, terms_dict, ia_dict, True))
 
     for n, i in tqdm.tqdm(enumerate(range(0, vec_train_protein_ids.shape[0], args.batch_size))):
