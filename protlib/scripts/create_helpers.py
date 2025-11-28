@@ -20,7 +20,7 @@ except Exception:
     obo_parser, Graph, ia_parser, get_funcs_mapper = None, None, None, None
 
 parser = argparse.ArgumentParser()
-# parser.add_argument('-c', '--config-path', type=str)
+# parser.add_argument('-c', '--og    -path', type=str)
 parser.add_argument('-o', '--output', type=str)
 parser.add_argument('-t', '--terms', type=str)
 parser.add_argument('-g', '--graph', type=str)
@@ -85,8 +85,7 @@ if __name__ == '__main__':
 
     vec_train_protein_ids = pd.read_feather(
         # os.path.join(config['base_path'], config['helpers_path'], 'fasta/train_seq.feather'),
-        os.path.join(config['base_path'], config['helpers_path'], 'fasta/train_seq.feather'),
-        columns=['EntryID'],
+        args.seq, columns=['EntryID'],
     )['EntryID'].values
 
     # ia_dict = ia_parser(os.path.join(config['base_path'], 'IA.txt'))
