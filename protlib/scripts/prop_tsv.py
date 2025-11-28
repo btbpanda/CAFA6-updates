@@ -57,6 +57,8 @@ if __name__ == '__main__':
 
     flg = True
 
+    os.makedirs(os.path.dirname(args.output), exist_ok=True)
+
     for i in tqdm.tqdm(range(0, length, args.batch_size)):
 
         sample = trainTerms.query(f'(id >= {i}) & (id < {i + args.batch_size})')
