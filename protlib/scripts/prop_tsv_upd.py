@@ -54,7 +54,7 @@ if __name__ == '__main__':
         int k;
         float *x_ptr;
         
-        x_ptr = &arr[0] + col;
+        x_ptr = &arr[0] + i_ * lx + col;
 
         for (k = 0; k < l; k++) {
             atomicAdd(x_ptr, arr[i_ * lx + j_[k]]);
