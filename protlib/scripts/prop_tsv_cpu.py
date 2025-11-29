@@ -35,6 +35,7 @@ if __name__ == '__main__':
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = args.device
     import numpy as cp
+    import numpy as np
     import pandas as cudf
     from numba import njit
 
