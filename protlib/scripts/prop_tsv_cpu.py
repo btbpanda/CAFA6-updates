@@ -37,7 +37,7 @@ if __name__ == '__main__':
     import numpy as cp
     import numpy as np
     import pandas as cudf
-    from numba import njit
+    from numba import njit, prange
 
     @njit
     def prop_max_cpu(mat, k, adj):
