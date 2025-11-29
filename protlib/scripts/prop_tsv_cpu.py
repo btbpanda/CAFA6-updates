@@ -16,20 +16,6 @@ parser.add_argument('-b', '--batch_size', type=int, default=30000)
 parser.add_argument('-bi', '--batch_inner', type=int, default=5000)
 
 
-@njit
-def prop_max_cpu(mat, k, adj):
-    for i in prange(mat.shape[0]):
-        if mat[i, k] == 1:
-            continue
-
-        for j in adj:
-            if mat[i, j] == 1:
-                mat[i, k] = 1
-                continue
-
-    return
-
-
 def propagate_target(mat, G):
     for f in G.order:
 
@@ -51,6 +37,19 @@ if __name__ == '__main__':
     import numpy as cp
     import pandas as cudf
     from numba import njit
+
+    @njit
+    def prop_max_cpu(mat, k, adj):
+        for i in prange(mat.shape[0]):
+            if mat[i, k] == 1:
+                continue
+
+            for j in adj:
+                if mat[i, j] == 1:
+                    mat[i, k] = 1
+                    continue
+
+        return
 
     try:
         from protlib.metric import get_funcs_mapper, get_ns_id, obo_parser, Graph
