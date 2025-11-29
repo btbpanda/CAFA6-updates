@@ -81,7 +81,7 @@ if __name__ == '__main__':
         ASPECT_CAFA5 if args.cafa == 5 else ASPECT_CAFA6
     )
 
-    print(terms)
+    # print(terms)
 
     vec_train_protein_ids = pd.read_feather(
         # os.path.join(config['base_path'], config['helpers_path'], 'fasta/train_seq.feather'),
@@ -101,7 +101,7 @@ if __name__ == '__main__':
         num = Series(np.arange(idx.shape[0]), index=idx)
         trm = terms.loc[idx]
 
-        print(trm)
+        # print(trm)
 
         # reformat targets
         for ont in ontologies:
@@ -110,7 +110,7 @@ if __name__ == '__main__':
 
             trm_ont = trm.query(f"namespace == '{ont.namespace}'").copy()
 
-            print(trm_ont)
+            # print(trm_ont)
 
             trm_ont['id'] = trm_ont['term'].map(get_funcs_mapper(ont)).values
             trm_ont['n'] = num.loc[trm_ont.index].values
