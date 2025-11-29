@@ -27,7 +27,8 @@ def propagate_max(mat, G):
             continue
 
         adj = cp.asarray(adj, dtype=cp.int64)
-        propagate_col_kernel(indexer, adj, f, adj.shape[0], mat.shape[1], mat.ravel())
+        # propagate_col_kernel(indexer, adj, f, adj.shape[0], mat.shape[1], mat.ravel())
+        mat[:, f] = cp.maximum(mat[:, f], mat[:, adj].max(axis=1))
 
     return
 
@@ -99,9 +100,10 @@ if __name__ == '__main__':
             mat = cp.zeros((batch_len, G.idxs), dtype=cp.float32)
             cp.add.at(mat, (sample_ont['id'].values, sample_ont['term_id'].values), 1)
             # mat.scatter_add((sample_ont['id'].values, sample_ont['term_id'].values), 1)
+            mat = cp.clip(mat, 0, 1)
 
             propagate_max(mat, G)
-            mat = cp.clip(mat, 0, 1)
+
 
             for j in range(0, mat.shape[0], args.batch_inner):
                 row, col = cp.nonzero(mat[j: j + args.batch_inner])
