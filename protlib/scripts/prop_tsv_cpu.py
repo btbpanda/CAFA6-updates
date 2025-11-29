@@ -10,6 +10,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-p', '--path', type=str)
 parser.add_argument('-g', '--graph', type=str)
 parser.add_argument('-o', '--output', type=str)
+parser.add_argument('-i', '--ia', type=str)
 
 parser.add_argument('-d', '--device', type=str, default="1")
 parser.add_argument('-b', '--batch_size', type=int, default=30000)
@@ -53,14 +54,15 @@ if __name__ == '__main__':
         return
 
     try:
-        from protlib.metric import get_funcs_mapper, get_ns_id, obo_parser, Graph
+        from protlib.metric import get_funcs_mapper, get_ns_id, obo_parser, Graph, ia_parser
     except Exception:
-        get_funcs_mapper, get_ns_id, obo_parser, Graph = [None] * 4
+        get_funcs_mapper, get_ns_id, obo_parser, Graph, ia_parser = [None] * 5
 
     trainTerms = cudf.read_csv(args.path, sep='\t', usecols=['EntryID', 'term'])
     ontologies = []
+    ia_dict = ia_parser(args.ia)
     for ns, terms_dict in obo_parser(args.graph).items():
-        ontologies.append(Graph(ns, terms_dict, None, True))
+        ontologies.append(Graph(ns, terms_dict, ia_dict, True))
 
     back_prot_id = trainTerms['EntryID'].drop_duplicates().reset_index(drop=True)
     length = len(back_prot_id)
