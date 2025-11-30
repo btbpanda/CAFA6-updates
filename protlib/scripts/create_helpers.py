@@ -160,7 +160,8 @@ if __name__ == '__main__':
             os.path.join(path, ns, f'nulls.npy'), nulls
         )
 
-        print(f'Total {ns} parsed: {priors['psum'].sum()}')
+        total = priors['psum'].sum()
+        print(f'Total {ns} parsed: {total}')
 
 
     
