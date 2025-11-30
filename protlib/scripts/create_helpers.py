@@ -66,14 +66,9 @@ def propagate_target(mat, G):
 if __name__ == '__main__':
     args = parser.parse_args()
 
-    # with open(args.config_path) as f:
-    #     config = yaml.safe_load(f)
-
-    # path = os.path.join(config['base_path'], config['helpers_path'], 'real_targets')
     path = args.output
     os.makedirs(path, exist_ok=True)
 
-    # trainTerms = pd.read_csv(os.path.join(config['base_path'], 'Train/train_terms.tsv'), sep='\t')
     trainTerms = pd.read_csv(args.terms, sep='\t')
 
     terms = trainTerms.set_index('EntryID')
@@ -81,19 +76,28 @@ if __name__ == '__main__':
         ASPECT_CAFA5 if args.cafa == 5 else ASPECT_CAFA6
     )
 
-    # print(terms)
-
     vec_train_protein_ids = pd.read_feather(
-        # os.path.join(config['base_path'], config['helpers_path'], 'fasta/train_seq.feather'),
         args.seq, columns=['EntryID'],
     )['EntryID'].values
 
-    # ia_dict = ia_parser(os.path.join(config['base_path'], 'IA.txt'))
     ia_dict = ia_parser(args.ia)
     ontologies = []
-    # for ns, terms_dict in obo_parser(os.path.join(config['base_path'], 'Train/go-basic.obo')).items():
+
     for ns, terms_dict in obo_parser(args.graph).items():
         ontologies.append(Graph(ns, terms_dict, ia_dict, True))
+
+    priors_D = {
+        'biological_process': {
+            'psum': 0, 'pcount': 0, 'nsum': 0, 'ncount': 0
+        },
+        'molecular_function': {
+            'psum': 0, 'pcount': 0, 'nsum': 0, 'ncount': 0
+        },
+        'cellular_component': {
+            'psum': 0, 'pcount': 0, 'nsum': 0, 'ncount': 0
+        },
+    }
+
 
     for n, i in tqdm.tqdm(enumerate(range(0, vec_train_protein_ids.shape[0], args.batch_size))):
 
@@ -101,16 +105,13 @@ if __name__ == '__main__':
         num = Series(np.arange(idx.shape[0]), index=idx)
         trm = terms.loc[idx]
 
-        # print(trm)
-
         # reformat targets
         for ont in ontologies:
 
-            os.makedirs(os.path.join(path, ont.namespace), exist_ok=True)
+            ns, terms_names = ont.namespace, [x['id'] for x in ont.terms_list]
+            os.makedirs(os.path.join(path, ns), exist_ok=True)
 
-            trm_ont = trm.query(f"namespace == '{ont.namespace}'").copy()
-
-            # print(trm_ont)
+            trm_ont = trm.query(f"namespace == '{ns}'").copy()
 
             trm_ont['id'] = trm_ont['term'].map(get_funcs_mapper(ont)).values
             trm_ont['n'] = num.loc[trm_ont.index].values
@@ -129,16 +130,42 @@ if __name__ == '__main__':
                     assert np.nansum(trg[na, k]) == 0, 'Should be empty'
                     trg[na, k] = np.nan
 
-            trg = DataFrame(trg, columns=[x['id'] for x in ont.terms_list])
+            trg = DataFrame(trg, columns=terms_names)
+            # update priors data
+            bs, nulls = trg.shape[0], trg.isnull().sum().values
+
+            priors_D[ns]['psum'] = priors_D[ns]['psum'] + trg.sum().fillna(0).values
+            priors_D[ns]['pcount'] = priors_D[ns]['pcount'] + bs - nulls
+
+            priors_D[ns]['nsum'] = priors_D[ns]['nsum'] + nulls
+            priors_D[ns]['ncount'] = priors_D[ns]['ncount'] + bs
+
+            # save partitioned
             trg['EntryID'] = idx
-            trg.to_parquet(os.path.join(path, ont.namespace, f'part_{str(n).zfill(2)}.parquet'))
+            trg.to_parquet(os.path.join(path, ns, f'part_{str(n).zfill(2)}.parquet'))
+
+    for ns in priors_D:
+        priors = priors_D[ns]
+
+        mean = np.where(priors['pcount'] == 0, 0, priors['psum'] / priors['pcount'])
+        nulls = priors['nsum'] / priors['ncount']
+
+        np.save(
+            os.path.join(path, ns, f'prior.npy'), mean
+        )
+
+        np.save(
+            os.path.join(path, ns, f'nulls.npy'), nulls
+        )
+
+
     
     # count priors
-    for ont in ontologies:
-        trg = pd.read_parquet(glob.glob(os.path.join(path, ont.namespace, f'part_*')),
-                              columns=[x['id'] for x in ont.terms_list])
-        mean = trg.mean().fillna(0).values
-        nulls = trg.isnull().mean().values
-
-        joblib.dump(mean, os.path.join(path, ont.namespace, f'prior.pkl'))
-        joblib.dump(nulls, os.path.join(path, ont.namespace, f'nulls.pkl'))
+    # for ont in ontologies:
+    #     trg = pd.read_parquet(glob.glob(os.path.join(path, ont.namespace, f'part_*')),
+    #                           columns=[x['id'] for x in ont.terms_list])
+    #     mean = trg.mean().fillna(0).values
+    #     nulls = trg.isnull().mean().values
+    #
+    #     joblib.dump(mean, os.path.join(path, ont.namespace, f'prior.pkl'))
+    #     joblib.dump(nulls, os.path.join(path, ont.namespace, f'nulls.pkl'))
