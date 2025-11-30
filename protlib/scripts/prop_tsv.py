@@ -12,8 +12,9 @@ parser.add_argument('-g', '--graph', type=str)
 parser.add_argument('-o', '--output', type=str)
 
 parser.add_argument('-d', '--device', type=str, default="1")
-parser.add_argument('-b', '--batch_size', type=int, default=30000)
-parser.add_argument('-bi', '--batch_inner', type=int, default=5000)
+parser.add_argument('-n', '--n-props', type=int)
+parser.add_argument('-b', '--batch-size', type=int, default=30000)
+parser.add_argument('-bi', '--batch-inner', type=int, default=5000)
 
 
 def propagate_max(mat, G):
@@ -76,7 +77,8 @@ if __name__ == '__main__':
             # mat.scatter_add((sample_ont['id'].values, sample_ont['term_id'].values), 1)
             mat = cp.clip(mat, 0, 1)
 
-            propagate_max(mat, G)
+            for _ in range(args.n_props):
+                propagate_max(mat, G)
 
             for j in range(0, mat.shape[0], args.batch_inner):
                 row, col = cp.nonzero(mat[j: j + args.batch_inner])
