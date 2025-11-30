@@ -72,6 +72,8 @@ if __name__ == '__main__':
     trainTerms = pd.read_csv(args.terms, sep='\t')
 
     terms = trainTerms.set_index('EntryID')
+    unique_terms = set(trainTerms['EntryID'])
+
     terms['namespace'] = terms['aspect'].map(
         ASPECT_CAFA5 if args.cafa == 5 else ASPECT_CAFA6
     )
@@ -103,7 +105,7 @@ if __name__ == '__main__':
 
         idx = vec_train_protein_ids[i: i + args.batch_size]
         num = Series(np.arange(idx.shape[0]), index=idx)
-        trm = terms.loc[idx]
+        trm = terms.loc[[x for x in idx if x in unique_terms]]
 
         # reformat targets
         for ont in ontologies:
@@ -157,6 +159,8 @@ if __name__ == '__main__':
         np.save(
             os.path.join(path, ns, f'nulls.npy'), nulls
         )
+
+        print(f'Total {ns} parsed: {priors['psum'].sum()}')
 
 
     
