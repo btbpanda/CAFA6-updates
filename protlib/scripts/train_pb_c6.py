@@ -205,7 +205,7 @@ if __name__ == '__main__':
 
         # print(prior)
 
-        if config['train_data'] == 'cafa5':
+        if config['train_data'] != 'cafa6':
             prior_old, denom_old = get_sample_prior(
                 os.path.join(args.sparse_labels, config['old_train_labels'], ns, ), config['conditional']
             )
@@ -224,8 +224,10 @@ if __name__ == '__main__':
     valid_sl = train['fold'] == args.fold_id
     pred_sl = valid_sl
 
-    if config['train_data'] == 'cafa5':
+    if config['train_data'] == 'cafa6':
         train_sl = train_sl & train['is_cafa6']
+
+    if config['valid_data'] == 'cafa6':
         valid_sl = valid_sl & train['is_cafa6']
 
     train_sl, valid_sl, pred_sl = np.nonzero(train_sl)[0], np.nonzero(valid_sl)[0], np.nonzero(pred_sl)[0]
