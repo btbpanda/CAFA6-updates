@@ -117,6 +117,6 @@ def get_targets_from_parquet(path, ontologies, split, ids=None, names=None, fill
             print('trg filled')
             trg = trg.fillna(0)
 
-        res.append(trg.values)
+        res.append(trg)
 
-    return np.concatenate(res, axis=1)
+    return pd.concat(res, axis=1)
