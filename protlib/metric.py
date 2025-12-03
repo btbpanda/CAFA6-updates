@@ -31,7 +31,7 @@ def get_ia(G, ia_path):
 
 def get_topk_targets(G, topk, train_path='Train', trainTerms=None, ex_top=False, freq_co=0):
     if trainTerms is None:
-        trainTerms = pd.read_csv(f'{train_path}/train_terms.tsv', sep='\t', usecols=['term', 'aspect'])
+        trainTerms = pd.read_csv(train_path, sep='\t', usecols=['term', 'aspect'])
     ns_id, ns_str = get_ns_id(G)
 
     asp = ns_str.upper() + 'O'
