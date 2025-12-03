@@ -10,6 +10,7 @@ sys.path.append(os.path.abspath(os.path.join(__file__, '../../../')))
 
 parser = argparse.ArgumentParser()
 
+parser.add_argument('-o', '--output', type=str)
 parser.add_argument('-t', '--fasta', type=str)
 parser.add_argument('-c', '--config', type=str)
 parser.add_argument('-e', '--embed_path', type=str)
