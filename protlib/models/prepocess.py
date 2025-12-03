@@ -36,7 +36,7 @@ def get_tax_ohe(tax_id, tax_list, intercept=True):
 
 def get_features(data, embed_path, prefix, embed_list, tax_list):
     res = [
-        get_tax_ohe(data['taxonomyID'], config['tax_list'], intercept=True)
+        get_tax_ohe(data['taxonomyID'], tax_list, intercept=True)
     ]
 
     for embed in embed_list:
