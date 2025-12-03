@@ -233,6 +233,16 @@ if __name__ == '__main__':
     train_sl, valid_sl, pred_sl = np.nonzero(train_sl)[0], np.nonzero(valid_sl)[0], np.nonzero(pred_sl)[0]
 
     params = config['train_params'].copy()
+
+    print('PARAMS: ')
+    print(config)
+
+    print(f'TRAIN FEATS SHAPE: {train_sl.shape[0]}, {X_train.shape[1]}')
+    print(f'TRAIN TARGET SHAPE: {train_sl.shape[0]}, {Y_train.shape[1]}')
+
+    print(f'VALID FEATS SHAPE: {valid_sl.shape[0]}, {X_train.shape[1]}')
+    print(f'TRAIN TARGET SHAPE: {valid_sl.shape[0]}, {Y_train.shape[1]}')
+
     model = LogRegMultilabel(**params)
 
     model.fit(

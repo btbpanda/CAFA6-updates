@@ -238,6 +238,15 @@ if __name__ == '__main__':
     params = config['train_params'].copy()
     params['multioutput_sketch'] = RandomProjectionSketch(params.pop('sketch_size'))
 
+    print('PARAMS: ')
+    print(config)
+
+    print(f'TRAIN FEATS SHAPE: {train_sl.shape[0]}, {X_train.shape[1]}')
+    print(f'TRAIN TARGET SHAPE: {train_sl.shape[0]}, {Y_train.shape[1]}')
+
+    print(f'VALID FEATS SHAPE: {valid_sl.shape[0]}, {X_train.shape[1]}')
+    print(f'TRAIN TARGET SHAPE: {valid_sl.shape[0]}, {Y_train.shape[1]}')
+
     model = GradientBoosting(
         BCEWithNaNLoss(), BCEwithNaNMetric(),
         **params
