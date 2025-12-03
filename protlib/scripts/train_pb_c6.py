@@ -18,7 +18,7 @@ parser.add_argument('-g', '--graph-path', type=str)
 parser.add_argument('-fl', '--freq-labels', type=str)
 parser.add_argument('-sl', '--sparse-labels', type=str)
 parser.add_argument('-f', '--fold-id', type=int)
-parser.add_argument('-d', '--device', type=int)
+parser.add_argument('-d', '--device', type=str)
 
 
 def get_sample_prior(source, cond):
