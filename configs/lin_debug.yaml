@@ -1,0 +1,50 @@
+name: lin_t5esm4500_raw
+embeds:
+    - t5
+    - esm2S1280
+conditional: True
+bp: 300
+mf: 100
+cc: 50
+
+train_labels: cafa6-sparse-labels
+old_train_labels: uniprot-old-sparse-labels
+
+train_data: cafa5 # options cafa6/cafa5
+valid_data: cafa6 # options cafa6/cafa5
+
+train_params:
+  alpha: 0.00001
+
+tax_list:
+    - 9606
+    - 3702
+    - 10090
+    - 7955
+    - 7227
+    - 10116
+    - 559292
+    - 6239
+    - 284812
+    - 83333
+    - 83332
+    - 44689
+    - 237561
+    - 39947
+    - 9031
+    - 36329
+    - 9913
+    - 227321
+    - 8355
+    - 9823
+    - 224308
+    - 330879
+    - 4577
+    - 170187
+    - 9615
+    - 99287
+    - 85962
+    - 243232
+    - 287
+    - 235443
+    - 8364

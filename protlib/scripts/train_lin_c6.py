@@ -233,8 +233,6 @@ if __name__ == '__main__':
     train_sl, valid_sl, pred_sl = np.nonzero(train_sl)[0], np.nonzero(valid_sl)[0], np.nonzero(pred_sl)[0]
 
     params = config['train_params'].copy()
-
-
     model = LogRegMultilabel(**params)
 
     model.fit(
