@@ -162,15 +162,3 @@ if __name__ == '__main__':
 
         total = priors['psum'].sum()
         print(f'Total {ns} parsed: {total}')
-
-
-    
-    # count priors
-    # for ont in ontologies:
-    #     trg = pd.read_parquet(glob.glob(os.path.join(path, ont.namespace, f'part_*')),
-    #                           columns=[x['id'] for x in ont.terms_list])
-    #     mean = trg.mean().fillna(0).values
-    #     nulls = trg.isnull().mean().values
-    #
-    #     joblib.dump(mean, os.path.join(path, ont.namespace, f'prior.pkl'))
-    #     joblib.dump(nulls, os.path.join(path, ont.namespace, f'nulls.pkl'))

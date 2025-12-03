@@ -37,7 +37,7 @@ if __name__ == '__main__':
 
     try:
         from protlib.metric import obo_parser, Graph, get_topk_targets
-        from protlib.models.prepocess import get_features_simple, get_targets_from_parquet
+        from protlib.models.prepocess import get_features, get_folds, get_targets_from_parquet
         from protlib.models.gbdt import BCEWithNaNLoss, BCEwithNaNMetric
 
     except ImportError:
