@@ -5,6 +5,7 @@ import pandas as pd
 import joblib
 import numpy as np
 import yaml
+from sklearn.utils import murmurhash3_32
 
 sys.path.append(os.path.abspath(os.path.join(__file__, '../../../')))
 
