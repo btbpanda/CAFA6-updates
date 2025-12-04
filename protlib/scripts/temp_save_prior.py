@@ -45,6 +45,18 @@ if __name__ == '__main__':
     with open(args.config, 'r') as f:
         config = yaml.safe_load(f)
 
+    train = pd.read_feather(
+        os.path.join(args.fasta, 'train_seq.feather')
+    )
+    train['is_cafa6'] = True
+    cafa6_size = train.shape[0]
+    
+    old_train = pd.read_feather(
+        os.path.join(args.fasta, 'old_train_seq.feather')
+    )
+    old_train['is_cafa6'] = False
+    cafa_old_size = old_train.shape[0]
+
     # save priors
 
     for ns in [
