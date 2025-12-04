@@ -2,7 +2,7 @@ name: pb_t5esm4500_raw
 embeds:
     - t5
     - esm2S1280
-conditional: True
+conditional: False
 bp: 300
 mf: 100
 cc: 50

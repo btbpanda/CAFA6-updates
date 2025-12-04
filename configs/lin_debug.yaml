@@ -10,7 +10,7 @@ cc: 50
 train_labels: cafa6-sparse-labels
 old_train_labels: uniprot-old-sparse-labels
 
-train_data: cafa5 # options cafa6/cafa5
+train_data: cafa6 # options cafa6/cafa5
 valid_data: cafa6 # options cafa6/cafa5
 
 train_params:

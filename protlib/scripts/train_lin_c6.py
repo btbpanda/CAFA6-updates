@@ -212,10 +212,10 @@ if __name__ == '__main__':
             # print(prior_old)
 
             wc6, wc5 = denom * cafa6_size, denom_old * cafa_old_size
-            prior = (prior * wc6 + prior_old * wc5) / (wc6 + wc5).clip(0.1, None)
+            prior = (prior * wc6 + prior_old * wc5) / np.clip(wc6 + wc5, 0.1, None)
             # print(prior)
 
-            np.save(os.path.join(args.output, config['name'], 'dumps', f'{ns}.npy'), prior, )
+        np.save(os.path.join(args.output, config['name'], 'dumps', f'{ns}.npy'), prior, )
 
     ################################
     # FIT PREDICT
