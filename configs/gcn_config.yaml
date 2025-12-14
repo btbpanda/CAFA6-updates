@@ -1,0 +1,22 @@
+
+train_data: cafa5 # options cafa6/cafa5
+
+train_params:
+  n_ep: 20
+  store_swa: 10
+  use_swa: 3
+
+  hidden_size: 16
+  n_layers: 8
+  embed_size: 8
+
+models:
+  - ./models/lin_cafa5_t5_uniprot-sparse-labels13500_cond/
+  - ./models/pb_cafa5_t5esm2S1280_uniprot-sparse-labels4500_cond/
+
+
+tta:
+  cfg0:
+    - ./models/lin_cafa5_t5_uniprot-sparse-labels13500_cond/
+    - ./models/pb_cafa5_t5esm2S1280_uniprot-sparse-labels4500_cond/
+

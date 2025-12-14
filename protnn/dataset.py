@@ -9,7 +9,6 @@ try:
 except ImportError:
     cp, get_depths = [None] * 2
 
-
 @jit(nopython=True)
 def propagate(arr, cnd_mask, col, n_mod, adj):
     for j in range(n_mod):
@@ -38,8 +37,8 @@ class Propagator:
         self.D = get_depths(G)
         cnd_mask = np.ones((len(preds), G.idxs), dtype=np.bool_)
 
-        for n, (_, idx, cond) in enumerate(preds):
-            if cond:
+        for n, pred in enumerate(preds):
+            if pred.cond:
                 continue
             cnd_mask[n, idx] = False
 
@@ -87,41 +86,13 @@ def get_dag_dense(G, direction='all', self_loop=True):
     return dst, src
 
 
-class StackDataLoader(DataLoader):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.n_mod = len(self.dataset.preds)
-        self.lo_idx = torch.arange(self.n_mod * 4).reshape((self.n_mod, 4))[:, 1:].ravel().cuda()
-
-        for direction in ['all', 'fwd', 'bwd']:
-            dst, src = get_dag_dense(self.dataset.G, direction=direction, self_loop=False)
-            self.__dict__[direction] = {'dst': dst.cuda(), 'src': src.cuda()}
-
-    def __iter__(self, ):
-        for batch in super().__iter__():
-            batch = {x: batch[x].cuda() for x in batch}
-            arr = torch.clamp(batch['x'][:, self.lo_idx], 1e-6, 1 - 1e-6)
-            batch['x'][:, self.lo_idx] = torch.log(arr / (1 - arr))
-
-            batch['x'] = batch['x'].swapaxes(1, 2)
-            batch['x'], batch['goa'] = batch['x'][..., :self.n_mod * 4], batch['x'][..., self.n_mod * 4:]
-
-            for direction in ['all', 'fwd', 'bwd']:
-                batch[direction] = self.__dict__[direction]
-
-            yield batch
-
-
 class StackDataset(Dataset):
 
-    def __init__(self, preds, nout, prior_raw, prior_cond, G, goa_list, p_goa=1, targets=None):
+    def __init__(self, preds, G, goa_list, p_goa=1, targets=None):
 
         self.preds = preds
-        self.nout = nout
-        self.prior_raw = prior_raw
-        self.prior_cond = prior_cond
         self.G = G
+        self.nout = len(G.terms_list)
         self.goa = [x.tolist() for x in goa_list]
         self.p_goa = p_goa
 
@@ -134,14 +105,10 @@ class StackDataset(Dataset):
         batch = {}
         x = []
 
-        for n, (pred, idx, cond) in enumerate(self.preds):
-            arr = np.ones((4, self.nout), dtype=np.float32)
-            arr[0, idx] = 0  # indicator that prediction comes from prior
-            arr[1] = self.prior_cond if cond else self.prior_raw  # prior for raw prediction
-            arr[2:] = self.prior_cond  # prior for propagated prediction
-            # (assume one of parents for 2 index and assume all parents for 3 index)
-            arr[1:, idx] = pred[index]  # fill with known predictions
-            x.append(torch.from_numpy(arr))
+        for prediction in self.preds:
+            x.append(
+                torch.from_numpy(prediction[index])
+            )
 
         # add go annotations
         goa = np.zeros((len(self.goa), self.nout), dtype=np.float32)
@@ -163,3 +130,30 @@ class StackDataset(Dataset):
     def __len__(self, ):
 
         return self.preds[0][0].shape[0]
+
+
+class StackDataLoader(DataLoader):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # self.device=device
+        self.n_mod = len(self.dataset.preds)
+        self.lo_idx = torch.arange(self.n_mod * 4).reshape((self.n_mod, 4))[:, 1:].ravel()  # .cuda()
+
+        for direction in ['all', 'fwd', 'bwd']:
+            dst, src = get_dag_dense(self.dataset.G, direction=direction, self_loop=False)
+            self.__dict__[direction] = {'dst': dst, 'src': src}
+
+    def __iter__(self, ):
+        for batch in super().__iter__():
+            # batch = {x: batch[x].cuda() for x in batch}
+            arr = torch.clamp(batch['x'][:, self.lo_idx], 1e-6, 1 - 1e-6)
+            batch['x'][:, self.lo_idx] = torch.log(arr / (1 - arr))
+
+            batch['x'] = batch['x'].swapaxes(1, 2)
+            batch['x'], batch['goa'] = batch['x'][..., :self.n_mod * 4], batch['x'][..., self.n_mod * 4:]
+
+            for direction in ['all', 'fwd', 'bwd']:
+                batch[direction] = self.__dict__[direction]
+
+            yield batch

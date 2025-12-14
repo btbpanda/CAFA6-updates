@@ -50,7 +50,7 @@ if __name__ == '__main__':
     )
     train['is_cafa6'] = True
     cafa6_size = train.shape[0]
-    
+
     old_train = pd.read_feather(
         os.path.join(args.fasta, 'old_train_seq.feather')
     )

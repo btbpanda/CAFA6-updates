@@ -2,6 +2,7 @@ import os
 import subprocess
 
 import numpy as np
+import polars as pl
 import pandas as pd
 import torch
 import tqdm
@@ -11,6 +12,28 @@ try:
     from protlib.cafa_utils import Graph, obo_parser
 except ImportError:
     pass
+
+
+def estimate_prior(path, G, batch_size=100):
+    terms_names = [x['id'] for x in G.terms_list]
+
+    prior_raw, prior_cnd = [], []
+
+    for i in tqdm.tqdm(range(0, len(terms_names), batch_size)):
+        data = pl.read_parquet(path, columns=terms_names[i: i + batch_size])
+        prior_cnd.append(
+            data.mean().fill_null(0).to_numpy()[0]
+            # TODO: Think about this fill_null, maybe not 0? Maybe estimate this constant
+        )
+
+        prior_raw.append(
+            data.fill_null(0).mean().to_numpy()[0]
+        )
+
+    prior_raw = np.concatenate(prior_raw)
+    prior_cnd = np.concatenate(prior_cnd)
+
+    return prior_raw, prior_cnd
 
 
 def get_labels(path, G, idx, src=None):
