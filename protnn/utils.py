@@ -14,6 +14,58 @@ except ImportError:
     pass
 
 
+class Prediction:
+
+    def __init__(self, path, graph, cond, prior_raw, prior_cond, prot_ids=None):
+
+        is_list = type(path) in [list, tuple]
+
+        if not is_list and os.path.isdir(path):
+            path = sorted(glob.glob(os.path.join(path, '*.parquet')))
+            is_list = True
+
+        terms_names = read_schema(
+            path[0] if is_list else path
+        ).names
+
+        terms_dict = {x['id']: n for (n, x) in enumerate(graph.terms_list)}
+        self.nout = len(terms_dict)
+        ns_names = [x for x in terms_names if x in terms_dict]
+        self.ns_idx = [terms_dict[x] for x in ns_names]
+
+        # self.index = pd.read_parquet(path, columns=['EntryID'])['EntryID'].tolist()
+        data = pd.read_parquet(path, columns=ns_names).values
+
+        if prot_ids is not None:
+            index = pd.read_parquet(path, columns=['EntryID'])
+            index = index.reset_index().set_index('EntryID').loc[prot_ids]['index'].values
+            data = data[index]
+
+        self.quantized = data.dtype == np.uint8
+        self.data = data
+        self.cond = cond
+        self.prior_raw = prior_raw
+        self.prior_cond = prior_cond
+
+    def __len__(self, ):
+        return len(self.data)
+
+    def __getitem__(self, index):
+
+        row = self.data[index]
+        if self.quantized:
+            row = row.astype(np.float32) / 255 + 1 / 512
+
+        arr = np.ones((4, self.nout), dtype=np.float32)
+        arr[0, self.ns_idx] = 0  # indicator that prediction comes from prior
+        arr[1] = self.prior_cond if self.cond else self.prior_raw  # prior for raw prediction
+        arr[2:] = self.prior_cond  # prior for propagated prediction
+        # (assume one of parents for 2 index and assume all parents for 3 index)
+        arr[1:, self.ns_idx] = row  # fill with known predictions
+
+        return arr
+
+
 def estimate_prior(path, G, batch_size=100):
     terms_names = [x['id'] for x in G.terms_list]
 
@@ -79,12 +131,13 @@ def get_goa_data(path, pref, ids, G):
 def make_raw_prediction(model, dl):
     model.eval()
 
-    out_shape = (dl.dataset.preds[0].shape[0], dl.dataset.nout)
+    out_shape = (len(dl.dataset), dl.dataset.nout)
     pred = np.zeros(out_shape, dtype=np.float32)
 
     start = 0
     with torch.no_grad():
         for batch in tqdm.tqdm(dl):
+            batch = {x: batch[x].cuda() for x in batch}
             pred[start: start + dl.batch_size] = model(batch).sigmoid().detach().cpu().numpy()
             start += dl.batch_size
 
@@ -99,6 +152,7 @@ def make_submission(model, dl, G, idx, path, mode='w', topk=500, tau=0.01):
 
     with torch.no_grad():
         for n, batch in enumerate(tqdm.tqdm(dl)):
+            batch = {x: batch[x].cuda() for x in batch}
             pred = model(batch).sigmoid()
 
             order = pred.argsort(dim=1, descending=True)[:, :topk]

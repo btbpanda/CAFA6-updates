@@ -12,6 +12,7 @@ def train(model, swa, train_dl, val_dl, evaluator, n_ep=20, lr=1e-3, clip_grad=1
 
         model.train()
         for batch in tqdm.tqdm(train_dl):
+            batch = {x: batch[x].cuda() for x in batch}
             opt.zero_grad()
 
             output = model(batch)
