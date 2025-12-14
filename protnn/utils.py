@@ -1,11 +1,12 @@
 import os
 import subprocess
-
+import glob
 import numpy as np
 import polars as pl
 import pandas as pd
 import torch
 import tqdm
+import yaml
 
 from pyarrow.parquet import read_schema
 
@@ -14,6 +15,17 @@ try:
     from protlib.cafa_utils import Graph, obo_parser
 except ImportError:
     pass
+
+
+def get_params_from_cfg(path):
+
+    with open(os.path.join(path, 'dumps/config.yaml'), 'r') as f:
+         cfg = yaml.safe_load(f)
+
+    params = {'cond': cfg['conditional']}
+    params = {**params, **(cafa5_priors if config['train_data'] == 'cafa5' else cafa6_priors)}
+
+    return params
 
 
 class Prediction:
