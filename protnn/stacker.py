@@ -1,6 +1,27 @@
 import torch
 from torch import nn
 
+def get_dag_dense(G, direction='all', self_loop=True):
+    dst, src = [], []
+
+    for i, node in enumerate(G.terms_list):
+        if self_loop:
+            dst.append(i)
+            src.append(i)
+
+        if direction in ['all', 'fwd']:
+            for j in node['adj']:
+                dst.append(i)
+                src.append(j)
+
+        if direction in ['all', 'bwd']:
+            for j in node['children']:
+                dst.append(i)
+                src.append(j)
+
+    dst, src = torch.LongTensor(dst), torch.LongTensor(src)
+
+    return dst, src
 
 class GCNLayer(nn.Module):
 
@@ -30,9 +51,14 @@ class GCNLayer(nn.Module):
 
 class GCNStacker(nn.Module):
 
-    def __init__(self, in_models, in_goa, out_features, hidden_size=16, n_layers=8, embed_size=16):
+    def __init__(self, in_models, in_goa, out_features, graph, hidden_size=16, n_layers=8, embed_size=16):
 
         super().__init__()
+
+        for direction in ['all', 'fwd', 'bwd']:
+            dst, src = get_dag_dense(graph, direction=direction, self_loop=False)
+            self.register_buffer(f'{direction}_dst', dst, )
+            self.register_buffer(f'{direction}_src', src, )
 
         self.in_models = in_models
         self.in_goa = in_goa
@@ -98,7 +124,7 @@ class GCNStacker(nn.Module):
         ):
             x = x0
             for gcn in gcns:
-                x = gcn(x, **batch[direction])
+                x = gcn(x, dst=getattr(self, f'{direction}_dst'), src=getattr(self, f'{direction}_src'))
             layers.append(x)
 
         x = torch.cat(layers, dim=2)  # n_samples * n_features * n_nodes

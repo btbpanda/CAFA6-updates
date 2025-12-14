@@ -79,7 +79,7 @@ def get_goa_data(path, pref, ids, G):
 def make_raw_prediction(model, dl):
     model.eval()
 
-    out_shape = (dl.dataset.preds[0][0].shape[0], dl.dataset.nout)
+    out_shape = (dl.dataset.preds[0].shape[0], dl.dataset.nout)
     pred = np.zeros(out_shape, dtype=np.float32)
 
     start = 0

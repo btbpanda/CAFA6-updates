@@ -110,16 +110,26 @@ class StackDataset(Dataset):
                 torch.from_numpy(prediction[index])
             )
 
+        x = torch.cat(x, dim=0).swapaxes(1, 2)
+        bs, nout, _ = x.shape
+        x = x.reshape((bs, nout, -1, 4))
+        x[..., 1:] = torch.clamp(x[..., 1:], 1e-6, 1 - 1e-6)
+        x[..., 1:] = torch.log(x[..., 1:] / (1 - x[..., 1:]))
+        batch['x'] = x.reshape((bs, nout, -1))
+
         # add go annotations
+        x_goa = []
+
         goa = np.zeros((len(self.goa), self.nout), dtype=np.float32)
         # if np.random.rand() < self.p_goa:
         for n, ann in enumerate(self.goa):
             ann = ann[index]
             if len(ann) > 0:
                 goa[n, ann] = 1
-        x.append(torch.from_numpy(goa))
+        x_goa.append(torch.from_numpy(goa))
 
-        batch['x'] = torch.cat(x, dim=0)
+        batch['goa'] = torch.cat(x_goa, dim=0).swapaxes(1, 2)
+
         self.prop(batch)
 
         if self.targets is not None:
@@ -131,29 +141,29 @@ class StackDataset(Dataset):
 
         return len(self.preds[0])
 
-
-class StackDataLoader(DataLoader):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # self.device=device
-        self.n_mod = len(self.dataset.preds)
-        self.lo_idx = torch.arange(self.n_mod * 4).reshape((self.n_mod, 4))[:, 1:].ravel()  # .cuda()
-
-        for direction in ['all', 'fwd', 'bwd']:
-            dst, src = get_dag_dense(self.dataset.G, direction=direction, self_loop=False)
-            self.__dict__[direction] = {'dst': dst, 'src': src}
-
-    def __iter__(self, ):
-        for batch in super().__iter__():
-            # batch = {x: batch[x].cuda() for x in batch}
-            arr = torch.clamp(batch['x'][:, self.lo_idx], 1e-6, 1 - 1e-6)
-            batch['x'][:, self.lo_idx] = torch.log(arr / (1 - arr))
-
-            batch['x'] = batch['x'].swapaxes(1, 2)
-            batch['x'], batch['goa'] = batch['x'][..., :self.n_mod * 4], batch['x'][..., self.n_mod * 4:]
-
-            for direction in ['all', 'fwd', 'bwd']:
-                batch[direction] = self.__dict__[direction]
-
-            yield batch
+#
+# class StackDataLoader(DataLoader):
+#
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         # self.device=device
+#         self.n_mod = len(self.dataset.preds)
+#         self.lo_idx = torch.arange(self.n_mod * 4).reshape((self.n_mod, 4))[:, 1:].ravel()  # .cuda()
+#
+#         for direction in ['all', 'fwd', 'bwd']:
+#             dst, src = get_dag_dense(self.dataset.G, direction=direction, self_loop=False)
+#             self.__dict__[direction] = {'dst': dst, 'src': src}
+#
+#     def __iter__(self, ):
+#         for batch in super().__iter__():
+#             # batch = {x: batch[x].cuda() for x in batch}
+#             arr = torch.clamp(batch['x'][:, self.lo_idx], 1e-6, 1 - 1e-6)
+#             batch['x'][:, self.lo_idx] = torch.log(arr / (1 - arr))
+#
+#             batch['x'] = batch['x'].swapaxes(1, 2)
+#             batch['x'], batch['goa'] = batch['x'][..., :self.n_mod * 4], batch['x'][..., self.n_mod * 4:]
+#
+#             for direction in ['all', 'fwd', 'bwd']:
+#                 batch[direction] = self.__dict__[direction]
+#
+#             yield batch
