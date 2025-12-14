@@ -67,6 +67,7 @@ class SWA:
             new_state = torch.load(self.file.format(k, score))
             # upd new state with weights
             for i in new_state.keys():
+                # TODO: Remove weighting for Long buffers
                 new_state[i] = new_state[i] * w
 
             if k == 0:
@@ -74,6 +75,7 @@ class SWA:
             else:
                 # upd state
                 for i in state_dict.keys():
+                    # TODO: Remove averaging for Long buffers
                     state_dict[i] += new_state[i]
 
         model.load_state_dict(state_dict)

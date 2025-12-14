@@ -311,6 +311,10 @@ class CAFAMetric:
         merged['bin_x'] = merged['bin'] + 1
         mtoi = merged.query('flg')
 
+        print(merged.columns)
+        print(mtoi.columns)
+        print(mtoi.groupby('entry_id')['bin_x'].max())
+
         cov = mtoi['entry_id'].nunique() - mtoi \
             .groupby('entry_id')['bin_x'].max() \
             .value_counts() \
