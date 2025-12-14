@@ -323,6 +323,15 @@ class CAFAMetric:
             .cumsum()
         )
 
+        # cov = mtoi['entry_id'].nunique() - mtoi \
+        #     .groupby('entry_id')['bin_x'].max() \
+        #     .value_counts() \
+        #     .to_frame() \
+        #     .join(cudf.DataFrame([], index=cudf.RangeIndex(n_bins)), how='right') \
+        #     .sort_index() \
+        #     .fillna(0) \
+        #     .cumsum()['bin_x'].values
+
         cov = mtoi['entry_id'].nunique() - mtoi \
             .groupby('entry_id')['bin_x'].max() \
             .value_counts() \
@@ -330,7 +339,7 @@ class CAFAMetric:
             .join(cudf.DataFrame([], index=cudf.RangeIndex(n_bins)), how='right') \
             .sort_index() \
             .fillna(0) \
-            .cumsum()['bin_x'].values
+            .cumsum().values
 
         inter = aggregate_fn(merged, 'inter', n_un, n_bins)
         pred = aggregate_fn(merged, 'wpred', n_un, n_bins)
