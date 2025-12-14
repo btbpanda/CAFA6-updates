@@ -111,11 +111,11 @@ class StackDataset(Dataset):
             )
 
         x = torch.cat(x, dim=0).swapaxes(0, 1)
-        bs, nout, _ = x.shape
-        x = x.reshape((bs, nout, -1, 4))
+        nout, _ = x.shape
+        x = x.reshape((nout, -1, 4))
         x[..., 1:] = torch.clamp(x[..., 1:], 1e-6, 1 - 1e-6)
         x[..., 1:] = torch.log(x[..., 1:] / (1 - x[..., 1:]))
-        batch['x'] = x.reshape((bs, nout, -1))
+        batch['x'] = x.reshape((nout, -1))
 
         # add go annotations
         x_goa = []
