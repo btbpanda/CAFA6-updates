@@ -313,7 +313,15 @@ class CAFAMetric:
 
         print(merged.columns)
         print(mtoi.columns)
-        print(mtoi.groupby('entry_id')['bin_x'].max())
+        print(mtoi['entry_id'].nunique() - mtoi \
+            .groupby('entry_id')['bin_x'].max() \
+            .value_counts() \
+            .to_frame() \
+            .join(cudf.DataFrame([], index=cudf.RangeIndex(n_bins)), how='right') \
+            .sort_index() \
+            .fillna(0) \
+            .cumsum()
+        )
 
         cov = mtoi['entry_id'].nunique() - mtoi \
             .groupby('entry_id')['bin_x'].max() \
