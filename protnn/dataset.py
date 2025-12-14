@@ -110,7 +110,7 @@ class StackDataset(Dataset):
                 torch.from_numpy(prediction[index])
             )
 
-        x = torch.cat(x, dim=0).swapaxes(1, 2)
+        x = torch.cat(x, dim=0).swapaxes(0, 1)
         bs, nout, _ = x.shape
         x = x.reshape((bs, nout, -1, 4))
         x[..., 1:] = torch.clamp(x[..., 1:], 1e-6, 1 - 1e-6)
@@ -128,7 +128,7 @@ class StackDataset(Dataset):
                 goa[n, ann] = 1
         x_goa.append(torch.from_numpy(goa))
 
-        batch['goa'] = torch.cat(x_goa, dim=0).swapaxes(1, 2)
+        batch['goa'] = torch.cat(x_goa, dim=0).swapaxes(0, 1)
 
         self.prop(batch)
 
