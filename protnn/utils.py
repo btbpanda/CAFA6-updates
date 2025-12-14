@@ -7,6 +7,8 @@ import pandas as pd
 import torch
 import tqdm
 
+from pyarrow.parquet import read_schema
+
 try:
     from protlib.metric import get_funcs_mapper, get_topk_targets, get_depths, get_ns_id
     from protlib.cafa_utils import Graph, obo_parser
