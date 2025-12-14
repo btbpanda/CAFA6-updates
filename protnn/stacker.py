@@ -51,7 +51,7 @@ class GCNLayer(nn.Module):
 
 class GCNStacker(nn.Module):
 
-    def __init__(self, in_models, in_goa, out_features, graph, hidden_size=16, n_layers=8, embed_size=16):
+    def __init__(self, in_models, in_goa, graph, hidden_size=16, n_layers=8, embed_size=16):
 
         super().__init__()
 
@@ -64,7 +64,7 @@ class GCNStacker(nn.Module):
         self.in_goa = in_goa
         # self.in_features = in_models * 4 + in_goa
 
-        self.nout = out_features
+        self.nout = G.idxs
         self.n_layers = n_layers
         self.embed_size = embed_size
         # node embedding
