@@ -129,7 +129,7 @@ class StackDataset(Dataset):
 
     def __len__(self, ):
 
-        return self.preds[0][0].shape[0]
+        return len(self.preds[0])
 
 
 class StackDataLoader(DataLoader):
