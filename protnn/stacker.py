@@ -64,7 +64,7 @@ class GCNStacker(nn.Module):
         self.in_goa = in_goa
         # self.in_features = in_models * 4 + in_goa
 
-        self.nout = G.idxs
+        self.nout = graph.idxs
         self.n_layers = n_layers
         self.embed_size = embed_size
         # node embedding
