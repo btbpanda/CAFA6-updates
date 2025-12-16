@@ -239,7 +239,7 @@ if __name__ == '__main__':
         embed_size=config['train_params']['embed_size']
     ).cuda()
 
-    if len(args.device) > 1:
+    if len(args.devices) > 1:
         model = nn.DataParallel(model)
 
     swa = SWA(
