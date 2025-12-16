@@ -296,7 +296,6 @@ class CAFA6Evaluator:
         self.ia_path = ia_path
         self.temp_dir = temp_dir
         self.train_terms = train_terms
-        self.ns = ns
         self.idx = idx
 
     def __call__(self, model, dl, topk=500, tau=0.01):
