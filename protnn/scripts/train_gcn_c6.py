@@ -266,5 +266,8 @@ if __name__ == '__main__':
     model = swa.set_weights(model, config['train_params']['use_swa'], weighted=False)
     torch.save(model.state_dict(), os.path.join(work_dir, f'checkpoint.pth'))
 
+    with open(os.path.join(work_dir, 'config.yaml'), 'w') as f:
+        yaml.safe_dump(config, f)
+
     score = evaluator(model, val_dl)
     print('Final CAFA5 score', score)
