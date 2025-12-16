@@ -2,9 +2,17 @@
 train_data: cafa5 # options cafa6/cafa5
 
 train_params:
-  n_ep: 20
+  n_ep: 3
   store_swa: 10
   use_swa: 3
+  p_goa: 0.5
+  num_workers: 8
+  batch_size: 32
+  test_batch_size: 128
+
+  lr: 0.001
+  clip_grad: 0.1
+  weight_decay: 0.00001
 
   hidden_size: 16
   n_layers: 8

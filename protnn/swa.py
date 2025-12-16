@@ -56,7 +56,7 @@ class SWA:
     def set_weights(self, model, n=10, weighted=True, **apex_params):
 
         n = min(n, len(self.scores))
-
+        state_dict = {}
         for k, score in enumerate(self.scores):
 
             if k == n:
@@ -67,16 +67,16 @@ class SWA:
             new_state = torch.load(self.file.format(k, score))
             # upd new state with weights
             for i in new_state.keys():
-                # TODO: Remove weighting for Long buffers
-                new_state[i] = new_state[i] * w
+                if torch.torch.is_floating_point(new_state[i]):
+                    new_state[i] = new_state[i] * w
 
             if k == 0:
                 state_dict = new_state
             else:
                 # upd state
                 for i in state_dict.keys():
-                    # TODO: Remove averaging for Long buffers
-                    state_dict[i] += new_state[i]
+                    if torch.torch.is_floating_point(state_dict[i]):
+                        state_dict[i] += new_state[i]
 
         model.load_state_dict(state_dict)
 

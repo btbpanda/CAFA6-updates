@@ -297,3 +297,39 @@ class CAFAEvaluator:
             score = float(f.readline())
 
         return score
+
+
+class CAFA6Evaluator:
+
+    def __init__(self, graph_path, ia_path, temp_dir, G, idx, train_terms, ):
+        self.G = G
+        self.graph_path = graph_path
+        self.ia_path = ia_path
+        self.temp_dir = temp_dir
+        self.train_terms = train_terms
+        self.ns = ns
+        self.idx = idx
+
+    def __call__(self, model, dl, topk=500, tau=0.01):
+        sub_file = os.path.join(self.temp_dir, 'prediction', 'sub.tsv')
+        os.makedirs(os.path.dirname(sub_file), exist_ok=True)
+
+        make_submission(
+            model, dl, self.G, self.idx, sub_file, mode='w', topk=topk, tau=tau
+        )
+
+        script = f"""cafaeval \
+            {self.graph_path} \
+            {os.path.dirname(sub_file)} \
+            {self.train_terms} \
+            -ia {self.ia_path} \
+            -no_orphans \
+            -prop fill \
+            -out_dir {os.path.join(self.temp_dir, 'results')}
+        """
+        subprocess.check_call(script, shell=True)
+
+        df = pd.read_csv(os.path.join(self.temp_dir, 'results', 'evaluation_best_f_w.tsv', ), sep='\t')
+        score = df.groupby('ns')['f_w'].max().to_dict()
+
+        return score[self.G.namespace]
