@@ -17,17 +17,6 @@ except ImportError:
     pass
 
 
-def get_params_from_cfg(path):
-
-    with open(os.path.join(path, 'dumps/config.yaml'), 'r') as f:
-         cfg = yaml.safe_load(f)
-
-    params = {'cond': cfg['conditional']}
-    params = {**params, **(cafa5_priors if cfg['train_data'] == 'cafa5' else cafa6_priors)}
-
-    return params
-
-
 class Prediction:
 
     def __init__(self, path, graph, cond, prior_raw, prior_cond, prot_ids=None):

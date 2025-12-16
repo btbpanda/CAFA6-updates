@@ -58,6 +58,15 @@ def train_gcn(model, swa, train_dl, val_dl, evaluator, n_ep=20, lr=1e-3, clip_gr
 
     return model, swa, scores
 
+def get_params_from_cfg(path):
+
+    with open(os.path.join(path, 'dumps/config.yaml'), 'r') as f:
+         cfg = yaml.safe_load(f)
+
+    params = {'cond': cfg['conditional']}
+    params = {**params, **(cafa5_priors if cfg['train_data'] == 'cafa5' else cafa6_priors)}
+
+    return params
 
 if __name__ == '__main__':
 
@@ -73,7 +82,7 @@ if __name__ == '__main__':
     try:
         from protlib.metric import obo_parser, Graph, ia_parser, get_topk_targets, get_depths
         from protnn.utils import get_labels, CAFAEvaluator, estimate_prior, Prediction, make_raw_prediction, \
-            make_submission, CAFA6Evaluator, get_params_from_cfg
+            make_submission, CAFA6Evaluator
 
         from protnn.dataset import *
         from protnn.stacker import *
