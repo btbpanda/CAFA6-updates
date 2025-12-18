@@ -2,7 +2,7 @@
 train_data: cafa5 # options cafa6/cafa5
 
 train_params:
-  n_ep: 3
+  n_ep: 1
   store_swa: 10
   use_swa: 3
   p_goa: 0.5
