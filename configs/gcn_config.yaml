@@ -1,5 +1,5 @@
 
-train_data: cafa5 # options cafa6/cafa5
+train_data: cafa6 # options cafa6/cafa5
 
 train_params:
   n_ep: 1
