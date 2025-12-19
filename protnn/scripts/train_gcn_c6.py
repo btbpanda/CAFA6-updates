@@ -278,5 +278,13 @@ if __name__ == '__main__':
     with open(os.path.join(work_dir, 'config.yaml'), 'w') as f:
         yaml.safe_dump(config, f)
 
+    np.savez(
+        os.path.join(work_dir, 'cafa5_priors.npz'), **cafa5_priors
+    )
+
+    np.savez(
+        os.path.join(work_dir, 'cafa6_priors.npz'), **cafa6_priors
+    )
+
     score = evaluator(model, val_dl)
     print('Final CAFA5 score', score)

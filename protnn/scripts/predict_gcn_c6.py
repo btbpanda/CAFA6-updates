@@ -3,7 +3,6 @@ import sys
 import os
 import glob
 import pandas as pd
-import polars as pl
 import numpy as np
 import joblib
 import yaml
@@ -41,7 +40,6 @@ def get_params_from_cfg(path):
 if __name__ == '__main__':
 
     args = parser.parse_args()
-    # Optional: set the device to run
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = ','.join(map(str, args.devices))
 
@@ -72,6 +70,78 @@ if __name__ == '__main__':
         nout = ont_dict[ontology]
         G = ontologies[nout]
 
+        model_path = os.path.join(args.model_path, ontology)
+        with open(os.path.join(model_path, 'config.yaml'), 'r') as f:
+            cfg = yaml.safe_load(f)
+
+        model = GCNStacker(
+            len(cfg['models']), 1,
+            G.idxs,
+            hidden_size=cfg['train_params']['hidden_size'],
+            n_layers=cfg['train_params']['n_layers'],
+            embed_size=cfg['train_params']['embed_size']
+        )
+        # TODO: change checkpoint path
+        model.load_state_dict(torch.load(os.path.join(model_path, 'checkpoint.pth')))
+        model = model.cuda()
+
+        cafa5_priors = np.load(
+            os.path.join(model_path, 'cafa5_priors.npz')
+        )
+
+        cafa6_priors = np.load(
+            os.path.join(model_path, 'cafa6_priors.npz')
+        )
+
+        # iterate over tta cfgs
+        for k, tta_cfg in enumerate(cfg['tta']):
+            output_path = os.path.join(args.output, ontology, f'pred_tta_{k}.tsv')
+            model_names = cfg['tta'][tta_cfg]
+
+            # get partitions from first prediction
+            for part in map(os.path.basename, glob.glob(os.path.join(model_names[0], '*.parquet'))):
+
+                test_id = pd.read_parquet(
+                    os.path.join(model_names[0], part), columns=['EntryID']
+                )['EntryID'].tolist()
+
+                train_preds = [
+                    Prediction(
+                        # TODO: check predictions path
+                        path=os.path.join(x, 'test', part),
+                        graph=G, prot_ids=test_id, **get_params_from_cfg(model_path)
+                    ) for x in model_names
+                ]
+
+                test_goa_data = [
+                    get_labels(
+                        path=os.path.join(args.elabels_path, 'test_auto.tsv'),
+                        G=G, idx=test_id
+                    )
+                ]
+
+                test_ds = StackDataset(
+                    test_preds,
+                    G,
+                    goa_list=test_goa_data,
+                    p_goa=1,
+                    targets=None
+                )
+                test_dl = DataLoader(
+                    test_ds, batch_size=cfg['train_params']['test_batch_size'], shuffle=False,
+                    num_workers=min(os.cpu_count(), cfg['train_params']['num_workers'])
+                )
+
+                make_submission(
+                    model,
+                    test_dl,
+                    G,
+                    test_id,
+                    output_path,
+                    mode=mode,
+                    topk=500,
+                    tau=0.01
+                )
 
 
 
