@@ -111,7 +111,7 @@ if __name__ == '__main__':
                     Prediction(
                         # TODO: check predictions path
                         path=os.path.join(x, 'predictions/test', part),
-                        graph=G, prot_ids=test_id, **get_params_from_cfg(model_path)
+                        graph=G, prot_ids=test_id, **get_params_from_cfg(x)
                     ) for x in model_names
                 ]
 
