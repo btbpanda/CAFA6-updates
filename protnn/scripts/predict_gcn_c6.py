@@ -62,6 +62,8 @@ if __name__ == '__main__':
 
     for n, ontology in enumerate(args.ontology):
         # mode = 'w' if n == 0 else 'a'
+        print(f'Predicting {ontology}...')
+
         nout = ont_dict[ontology]
         G = ontologies[nout]
 
@@ -88,6 +90,8 @@ if __name__ == '__main__':
 
         # iterate over tta cfgs
         for k, tta_cfg in enumerate(cfg['tta']):
+            print(f'Running {tta_cfg}...')
+
             output_path = os.path.join(args.output, ontology, f'pred_tta_{k}.tsv')
             model_names = cfg['tta'][tta_cfg]
 
