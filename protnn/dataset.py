@@ -40,7 +40,7 @@ class Propagator:
         for n, pred in enumerate(preds):
             if pred.cond:
                 continue
-            cnd_mask[n, idx] = False
+            cnd_mask[n, pred.ns_idx] = False
 
         self.adj = [np.asarray(x['adj']) for x in G.terms_list]
 
