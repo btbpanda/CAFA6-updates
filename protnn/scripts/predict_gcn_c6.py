@@ -98,7 +98,7 @@ if __name__ == '__main__':
 
             # get partitions from first prediction
             for j, part in enumerate(
-                    map(os.path.basename, glob.glob(os.path.join(model_names[0], '*.parquet')))
+                    map(os.path.basename, glob.glob(os.path.join(model_names[0], 'test', '*.parquet')))
             ):
                 mode ='a' if n + j else 'w'
                 test_id = pd.read_parquet(
