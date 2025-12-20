@@ -13,7 +13,6 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('-g', '--graph-path', type=str)
 parser.add_argument('-el', '--elabels-path', type=str)
-parser.add_argument('-f', '--fasta', type=str)
 parser.add_argument('-m', '--model-path', type=str)
 parser.add_argument('-out', '--output', type=str)
 
@@ -69,17 +68,15 @@ if __name__ == '__main__':
         model_path = os.path.join(args.model_path, ontology)
         with open(os.path.join(model_path, 'config.yaml'), 'r') as f:
             cfg = yaml.safe_load(f)
-
+            
         model = GCNStacker(
-            len(cfg['models']), 1,
-            G.idxs,
+            len(cfg['models']), 1, G,
             hidden_size=cfg['train_params']['hidden_size'],
             n_layers=cfg['train_params']['n_layers'],
             embed_size=cfg['train_params']['embed_size']
-        )
-        # TODO: change checkpoint path
+        ).cuda()
         model.load_state_dict(torch.load(os.path.join(model_path, 'checkpoint.pth')))
-        model = model.cuda()
+
 
         cafa5_priors = np.load(
             os.path.join(model_path, 'cafa5_priors.npz')
