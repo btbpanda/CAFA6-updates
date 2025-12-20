@@ -273,6 +273,10 @@ if __name__ == '__main__':
 
     # validate SWA
     model = swa.set_weights(model, config['train_params']['use_swa'], weighted=False)
+
+    if type(model) is nn.DataParallel:
+        model = model.module
+
     torch.save(model.state_dict(), os.path.join(work_dir, f'checkpoint.pth'))
 
     with open(os.path.join(work_dir, 'config.yaml'), 'w') as f:

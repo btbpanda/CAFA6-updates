@@ -8,7 +8,7 @@ train_params:
   p_goa: 0.5
   num_workers: 8
   batch_size: 32
-  test_batch_size: 128
+  test_batch_size: 512
 
   lr: 0.001
   clip_grad: 0.1

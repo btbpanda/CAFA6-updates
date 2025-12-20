@@ -77,8 +77,10 @@ if __name__ == '__main__':
             n_layers=cfg['train_params']['n_layers'],
             embed_size=cfg['train_params']['embed_size']
         ).cuda()
-        model = nn.DataParallel(model)
         model.load_state_dict(torch.load(os.path.join(model_path, 'checkpoint.pth')))
+
+        if len(args.devices) > 1:
+            model = nn.DataParallel(model)
 
         cafa5_priors = np.load(
             os.path.join(model_path, 'cafa5_priors.npz')
@@ -92,7 +94,7 @@ if __name__ == '__main__':
         for k, tta_cfg in enumerate(cfg['tta']):
             print(f'Running {tta_cfg}...')
 
-            output_path = os.path.join(args.output, ontology, f'pred_tta_{k}.tsv')
+            output_path = os.path.join(args.output, f'pred_tta_{k}.tsv')
             model_names = cfg['tta'][tta_cfg]
             print(model_names)
 
