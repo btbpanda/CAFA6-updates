@@ -4,12 +4,8 @@ import os
 import glob
 import pandas as pd
 import numpy as np
-import joblib
 import yaml
-import s3fs
-import subprocess
-from tqdm import tqdm
-from pyarrow.parquet import read_schema
+
 
 sys.path.append(os.path.abspath(os.path.join(__file__, '../../../')))
 print(sys.executable)
@@ -66,7 +62,7 @@ if __name__ == '__main__':
         ontologies.append(Graph(ns, terms_dict, None, True))
 
     for n, ontology in enumerate(args.ontology):
-        mode = 'w' if n == 0 else 'a'
+        # mode = 'w' if n == 0 else 'a'
         nout = ont_dict[ontology]
         G = ontologies[nout]
 
@@ -99,13 +95,15 @@ if __name__ == '__main__':
             model_names = cfg['tta'][tta_cfg]
 
             # get partitions from first prediction
-            for part in map(os.path.basename, glob.glob(os.path.join(model_names[0], '*.parquet'))):
-
+            for j, part in enumerate(
+                    map(os.path.basename, glob.glob(os.path.join(model_names[0], '*.parquet')))
+            ):
+                mode ='a' if n + j else 'w'
                 test_id = pd.read_parquet(
                     os.path.join(model_names[0], part), columns=['EntryID']
                 )['EntryID'].tolist()
 
-                train_preds = [
+                test_preds = [
                     Prediction(
                         # TODO: check predictions path
                         path=os.path.join(x, 'test', part),
