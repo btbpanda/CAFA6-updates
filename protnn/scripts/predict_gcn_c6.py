@@ -94,6 +94,7 @@ if __name__ == '__main__':
 
             output_path = os.path.join(args.output, ontology, f'pred_tta_{k}.tsv')
             model_names = cfg['tta'][tta_cfg]
+            print(model_names)
 
             # get partitions from first prediction
             for j, part in enumerate(
