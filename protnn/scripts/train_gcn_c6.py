@@ -3,14 +3,11 @@ import sys
 import os
 import glob
 import pandas as pd
-import polars as pl
 import numpy as np
 import joblib
 import yaml
-import s3fs
-import subprocess
 from tqdm import tqdm
-from pyarrow.parquet import read_schema
+from numba import set_num_threads
 
 sys.path.append(os.path.abspath(os.path.join(__file__, '../../../')))
 print(sys.executable)
@@ -94,6 +91,8 @@ if __name__ == '__main__':
 
     with open(args.config, 'r') as f:
         config = yaml.safe_load(f)
+
+    set_num_threads(config['train_params']['num_workers'])
 
     graph_path = args.graph_path
     ia_path = args.ia_path
