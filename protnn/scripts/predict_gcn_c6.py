@@ -96,13 +96,15 @@ if __name__ == '__main__':
             model_names = cfg['tta'][tta_cfg]
             print(model_names)
 
+            partitions = sorted(
+                glob.glob(os.path.join(model_names[0], 'predictions/test', '*.parquet'))
+            )
+
             # get partitions from first prediction
-            for j, part in enumerate(
-                    map(os.path.basename, glob.glob(os.path.join(model_names[0], 'predictions/test', '*.parquet')))
-            ):
+            for j, part in enumerate(map(os.path.basename, partitions)):
                 mode ='a' if n + j else 'w'
                 test_id = pd.read_parquet(
-                    os.path.join(model_names[0], part), columns=['EntryID']
+                    os.path.join(model_names[0], 'predictions/test', part), columns=['EntryID']
                 )['EntryID'].tolist()
 
                 test_preds = [
