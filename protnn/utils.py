@@ -148,6 +148,9 @@ def make_raw_prediction(model, dl):
 
 
 def make_submission(model, dl, G, idx, path, mode='w', topk=500, tau=0.01):
+
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+
     model.eval()
     terms = np.array([x['id'] for x in G.terms_list])
     idx = np.array(idx)
