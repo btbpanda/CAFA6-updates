@@ -94,8 +94,8 @@ if __name__ == '__main__':
     prop_min_kernel = get_kernel('min')
 
     graph_path = args.graph_path # os.path.join(config['base_path'], 'Train/go-basic.obo')
-    input_path = args.input_file # os.path.join(pp_path, 'pred.tsv')
-    output_path = args.output_file # os.path.join(pp_path, f'pred_{args.direction}.tsv')
+    input_path = args.input_path # os.path.join(pp_path, 'pred.tsv')
+    output_path = args.output_path # os.path.join(pp_path, f'pred_{args.direction}.tsv')
 
     trainTerms = cudf.read_csv(input_path, sep='\t', names=['EntryID', 'term', 'prob'], header=None)
     ontologies = []
