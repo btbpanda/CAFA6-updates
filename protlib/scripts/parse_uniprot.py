@@ -33,7 +33,7 @@ if __name__ == '__main__':
         header=None,
         names=['x', 'EntryID', 'xx', 'type', 'term', 'y', 'source', 'yyy', 'z', 'zz', 'zzz', 'a', 'aa', 'date', 'b',
                'bb', 'bbb'],
-        usecols=['EntryID', 'term', 'source', ],
+        usecols=['EntryID', 'type',  'term', 'source', ],
         chunksize=1_000_000,
         na_filter=True
     )
@@ -45,7 +45,7 @@ if __name__ == '__main__':
         if n == 0:
             batch = batch.dropna()
 
-        filtred = batch[(batch['EntryID'].isin(idxs))]
+        filtred = batch[(batch['EntryID'].isin(idxs)) & (~batch['type'].fillna('').str.startswith('NOT'))]
         filtred = filtred[['EntryID', 'term', 'source', ]].drop_duplicates()
 
         if len(store) > 0 and len(filtred) > 0 and \
