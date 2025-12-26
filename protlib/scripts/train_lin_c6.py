@@ -249,11 +249,6 @@ if __name__ == '__main__':
         X_train[train_sl], Y_train[train_sl],
     )
 
-    joblib.dump(
-        model,
-        os.path.join(args.output, config['name'], 'dumps', f'model_{args.fold_id}.pkl'),
-    )
-
     oof_pred = model.predict(X_train[pred_sl], )
     test_pred = model.predict(X_test, )
 
@@ -281,4 +276,9 @@ if __name__ == '__main__':
     oof_pred.query('~is_cafa6').drop('is_cafa6', axis=1).to_parquet(
         os.path.join(args.output, config['name'], 'oof_old_pred', f'fold_{args.fold_id}.parquet'),
         index=False,
+    )
+
+    joblib.dump(
+        model,
+        os.path.join(args.output, config['name'], 'dumps', f'model_{args.fold_id}.pkl'),
     )

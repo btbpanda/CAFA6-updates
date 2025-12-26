@@ -257,10 +257,6 @@ if __name__ == '__main__':
         eval_sets=[{'X': X_train[valid_sl], 'y': Y_train[valid_sl]}]
     )
 
-    joblib.dump(
-        model,
-        os.path.join(args.output, config['name'], 'dumps', f'model_{args.fold_id}.pkl'),
-    )
 
     oof_pred = model.predict(X_train[pred_sl], batch_size=5000)
     test_pred = model.predict(X_test, batch_size=5000)
@@ -290,3 +286,9 @@ if __name__ == '__main__':
         os.path.join(args.output, config['name'], 'oof_old_pred', f'fold_{args.fold_id}.parquet'),
         index=False,
     )
+
+    joblib.dump(
+        model,
+        os.path.join(args.output, config['name'], 'dumps', f'model_{args.fold_id}.pkl'),
+    )
+
