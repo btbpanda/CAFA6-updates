@@ -120,7 +120,9 @@ if __name__ == '__main__':
             sample_ont['id'] = sample_ont['id'] - i
 
             mat = cp.zeros((batch_len, G.idxs), dtype=cp.float32)
-            cp.add.at(mat, (sample_ont['id'].values, sample_ont['term_id'].values), 1)
+            cp.add.at(
+                mat, (sample_ont['id'].values, sample_ont['term_id'].values), 1
+            )
             # mat.scatter_add((sample_ont['id'].values, sample_ont['term_id'].values), 1)
             mat = cp.clip(mat, 0, 1)
 
