@@ -4,6 +4,8 @@ import sys
 
 import tqdm
 
+from functools import partial
+
 sys.path.append(os.path.abspath(os.path.join(__file__, '../../../')))
 
 parser = argparse.ArgumentParser()
@@ -13,7 +15,10 @@ parser.add_argument('-o', '--output', type=str)
 
 parser.add_argument('-d', '--device', type=str, default="1")
 parser.add_argument('-n', '--n-props', type=int)
-parser.add_argument('-dr', '--direction', type=str, default='max')
+parser.add_argument('-dr', '--direction', type=str, default='backward')
+parser.add_argument('-f', '--func', type=str, default='max')
+
+
 parser.add_argument('-b', '--batch-size', type=int, default=30000)
 parser.add_argument('-bi', '--batch-inner', type=int, default=5000)
 
@@ -41,7 +46,7 @@ def get_kernel(direction):
     return kernel
 
 
-def propagate_max(mat, G):
+def propagate_bwd(mat, G, kernel):
     indexer = cp.arange(mat.shape[0])
 
     for f in G.order:
@@ -52,12 +57,12 @@ def propagate_max(mat, G):
             continue
 
         adj = cp.asarray(adj, dtype=cp.int64)
-        prop_max_kernel(indexer, adj, f, adj.shape[0], mat.shape[1], mat.ravel())
+        kernel(indexer, adj, f, adj.shape[0], mat.shape[1], mat.ravel())
 
     return
 
 
-def propagate_min(mat, G):
+def propagate_fwd(mat, G, kernel):
     indexer = cp.arange(mat.shape[0])
 
     D = get_depths(G, True)
@@ -70,7 +75,7 @@ def propagate_min(mat, G):
                 continue
 
             adj = cp.asarray(adj, dtype=cp.int64)
-            prop_min_kernel(indexer, adj, f, adj.shape[0], mat.shape[1], mat.ravel())
+            kernel(indexer, adj, f, adj.shape[0], mat.shape[1], mat.ravel())
 
     return
 
@@ -91,7 +96,8 @@ if __name__ == '__main__':
     prop_max_kernel = get_kernel('max')
     prop_min_kernel = get_kernel('min')
 
-    propagate = propagate_max if args.direction == 'max' else propagate_min
+    propagate_d = propagate_fwd if args.direction == 'forward' else propagate_bwd
+    propagate = partial(propagate_d, kernel=prop_max_kernel if args.func == 'max' else prop_min_kernel)
 
     trainTerms = cudf.read_csv(args.path, sep='\t', usecols=['EntryID', 'term'])
     ontologies = []
