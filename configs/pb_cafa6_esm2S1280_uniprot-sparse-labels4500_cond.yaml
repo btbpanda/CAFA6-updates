@@ -4,7 +4,7 @@ conditional: true
 embeds:
 - esm2S1280
 mf: 1000
-name: pb_cafa6_esm2S1280_uniprot-sparse-labels4500_cond
+name: pb_cafa6_esm2S1280_uniprot-sparse-labels4500_cond_v2
 old_train_labels: uniprot-old-sparse-labels
 tax_list:
 - 9606

@@ -5,7 +5,7 @@ embeds:
 - t5
 - esm2S1280
 mf: 1000
-name: pb_cafa5_t5esm2S1280_uniprot-sparse-labels4500_raw
+name: pb_cafa5_t5esm2S1280_uniprot-sparse-labels4500_raw_v2
 old_train_labels: uniprot-old-sparse-labels
 tax_list:
 - 9606
@@ -55,4 +55,4 @@ train_params:
   subsample: 0.8
   use_hess: false
   verbose: 100
-valid_data: cafa6
+valid_data: cafa5

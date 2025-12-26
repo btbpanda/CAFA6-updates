@@ -4,7 +4,7 @@ conditional: true
 embeds:
 - t5
 mf: 2000
-name: lin_cafa6_t5_uniprot-sparse-labels13500_cond
+name: lin_cafa6_t5_uniprot-sparse-labels13500_cond_v2
 old_train_labels: uniprot-old-sparse-labels
 tax_list:
 - 9606

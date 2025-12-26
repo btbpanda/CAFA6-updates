@@ -1,10 +1,10 @@
 bp: 3000
 cc: 500
-conditional: true
+conditional: false
 embeds:
-- esm2S1280
+- t5
 mf: 1000
-name: pb_cafa5_esm2S1280_uniprot-sparse-labels4500_cond_v2
+name: pb_cafa5_t5_cafa6-sparse-labels4500_raw_v2
 old_train_labels: uniprot-old-sparse-labels
 tax_list:
 - 9606
@@ -39,7 +39,7 @@ tax_list:
 - 235443
 - 8364
 train_data: cafa5
-train_labels: uniprot-sparse-labels
+train_labels: cafa6-sparse-labels
 train_params:
   colsample: 0.8
   es: 300
