@@ -210,7 +210,7 @@ if __name__ == '__main__':
 
     test_goa_data = [
         get_labels(
-            path=os.path.join(args.elabels_path, 'test_auto.tsv'),
+            path=os.path.join(args.elabels_path, 'test_auto226.tsv'),
             G=G, idx=ids_to_take
         )
     ]
