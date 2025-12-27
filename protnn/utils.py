@@ -325,73 +325,73 @@ class CAFA6Evaluator:
 
         return score[self.G.namespace]
 
-    class CAFA6x3Evaluator:
+class CAFA6x3Evaluator:
 
-        def __init__(self, graph_path, ia_path, temp_dir, G, idx, test_terms, train_terms, ):
-            self.G = G
-            self.graph_path = graph_path
-            self.ia_path = ia_path
-            self.temp_dir = temp_dir
-            self.test_terms = test_terms
-            self.train_terms = train_terms
-            self.idx = idx
+    def __init__(self, graph_path, ia_path, temp_dir, G, idx, test_terms, train_terms, ):
+        self.G = G
+        self.graph_path = graph_path
+        self.ia_path = ia_path
+        self.temp_dir = temp_dir
+        self.test_terms = test_terms
+        self.train_terms = train_terms
+        self.idx = idx
 
-        def __call__(self, model, dl, topk=500, tau=0.01):
-            sub_file = os.path.join(self.temp_dir, 'prediction', 'sub.tsv')
-            os.makedirs(os.path.dirname(sub_file), exist_ok=True)
+    def __call__(self, model, dl, topk=500, tau=0.01):
+        sub_file = os.path.join(self.temp_dir, 'prediction', 'sub.tsv')
+        os.makedirs(os.path.dirname(sub_file), exist_ok=True)
 
-            make_submission(
-                model, dl, self.G, self.idx, sub_file, mode='w', topk=topk, tau=tau
-            )
+        make_submission(
+            model, dl, self.G, self.idx, sub_file, mode='w', topk=topk, tau=tau
+        )
 
-            scores = []
+        scores = []
 
-            for test_file in ['no-know', 'lim-know', 'part-know']:
+        for test_file in ['no-know', 'lim-know', 'part-know']:
 
-                terms_file = os.path.join(self.test_terms, test_file + '.tsv')
+            terms_file = os.path.join(self.test_terms, test_file + '.tsv')
 
-                if test_file == 'part-know':
+            if test_file == 'part-know':
 
-                    gt = pd.read_csv(terms_file, sep='\t', usecols=['EntryID', 'term'])
-                    prot = set(gt['EntryID'])
-                    known = pd.read_csv(self.train_terms, sep='\t', usecols=['EntryID', 'term'])
-                    known = known[known['EntryID'].isin(prot)]
+                gt = pd.read_csv(terms_file, sep='\t', usecols=['EntryID', 'term'])
+                prot = set(gt['EntryID'])
+                known = pd.read_csv(self.train_terms, sep='\t', usecols=['EntryID', 'term'])
+                known = known[known['EntryID'].isin(prot)]
 
-                    gt = pd.concat([gt, known], ignore_index=True).drop_duplicates()
-                    new_terms_file = os.path.join(self.temp_dir, 'results', 'evaluation_best_f_w.tsv', )
-                    gt.to_csv(
-                        new_terms_file, index=False, sep='\t'
-                    )
+                gt = pd.concat([gt, known], ignore_index=True).drop_duplicates()
+                new_terms_file = os.path.join(self.temp_dir, 'results', 'evaluation_best_f_w.tsv', )
+                gt.to_csv(
+                    new_terms_file, index=False, sep='\t'
+                )
 
-                    script = f"""cafaeval \
-                        {self.graph_path} \
-                        {os.path.dirname(sub_file)} \
-                        {new_terms_file} \
-                        -known {self.train_terms} \
-                        -ia {self.ia_path} \
-                        -no_orphans \
-                        -prop fill \
-                        -out_dir {os.path.join(self.temp_dir, 'results')}
-                    """
-                else:
+                script = f"""cafaeval \
+                    {self.graph_path} \
+                    {os.path.dirname(sub_file)} \
+                    {new_terms_file} \
+                    -known {self.train_terms} \
+                    -ia {self.ia_path} \
+                    -no_orphans \
+                    -prop fill \
+                    -out_dir {os.path.join(self.temp_dir, 'results')}
+                """
+            else:
 
-                    script = f"""cafaeval \
-                        {self.graph_path} \
-                        {os.path.dirname(sub_file)} \
-                        {terms_file} \
-                        -ia {self.ia_path} \
-                        -no_orphans \
-                        -prop fill \
-                        -out_dir {os.path.join(self.temp_dir, 'results')}
-                    """
-                subprocess.check_call(script, shell=True)
+                script = f"""cafaeval \
+                    {self.graph_path} \
+                    {os.path.dirname(sub_file)} \
+                    {terms_file} \
+                    -ia {self.ia_path} \
+                    -no_orphans \
+                    -prop fill \
+                    -out_dir {os.path.join(self.temp_dir, 'results')}
+                """
+            subprocess.check_call(script, shell=True)
 
-                df = pd.read_csv(os.path.join(self.temp_dir, 'results', 'evaluation_best_f_w.tsv', ), sep='\t')
-                score = df.groupby('ns')['f_w'].max().to_dict()
-                score =  score[self.G.namespace]
+            df = pd.read_csv(os.path.join(self.temp_dir, 'results', 'evaluation_best_f_w.tsv', ), sep='\t')
+            score = df.groupby('ns')['f_w'].max().to_dict()
+            score =  score[self.G.namespace]
 
-                scores.append(score)
+            scores.append(score)
 
-                print(f'F1 {self.G.namespace} {test_file}: ', score)
+            print(f'F1 {self.G.namespace} {test_file}: ', score)
 
-            return np.mean(scores)
+        return np.mean(scores)
