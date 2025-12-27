@@ -18,6 +18,9 @@ parser.add_argument('-ia', '--ia-path', type=str)
 parser.add_argument('-t', '--target-path', type=str)
 parser.add_argument('-to', '--target-old-path', type=str)
 parser.add_argument('-el', '--elabels-path', type=str)
+parser.add_argument('-tl', '--test-path', type=str)
+parser.add_argument('-tt', '--train-terms', type=str)
+
 parser.add_argument('-f', '--fasta', type=str)
 parser.add_argument('-out', '--output', type=str)
 
@@ -79,7 +82,7 @@ if __name__ == '__main__':
     try:
         from protlib.metric import obo_parser, Graph, ia_parser, get_topk_targets, get_depths
         from protnn.utils import get_labels, CAFAEvaluator, estimate_prior, Prediction, make_raw_prediction, \
-            make_submission, CAFA6Evaluator
+            make_submission, CAFA6x3Evaluator
 
         from protnn.dataset import *
         from protnn.stacker import *
@@ -183,12 +186,27 @@ if __name__ == '__main__':
     # VALID DATA
     ############################################
 
-    test_labels = pd.read_csv(
-        os.path.join(args.elabels_path, 'test_leak_terms.tsv'), sep='\t'
-    ).drop_duplicates().reset_index(drop=True)
+    no_know = pd.read_csv(
+        os.path.join(args.test_path, 'no-know.tsv'), sep='\t'
+    )
 
-    test_labels.to_csv(os.path.join(temp_dir, 'labels.tsv'), index=False, sep='\t')
-    ids_to_take = test_labels['EntryID'].drop_duplicates().values
+    lim_know = pd.read_csv(
+        os.path.join(args.test_path, 'lim-know.tsv'), sep='\t'
+    )
+
+    part_know = pd.read_csv(
+        os.path.join(args.test_path, 'part-know.tsv'), sep='\t'
+    )
+
+    ids_to_take = pd.concat([no_know, lim_know, part_know], ignore_index=True)['EntryID'] \
+        .drop_duplicates().values
+
+    # test_labels = pd.read_csv(
+    #     os.path.join(args.elabels_path, 'test_leak_terms.tsv'), sep='\t'
+    # ).drop_duplicates().reset_index(drop=True)
+    #
+    # test_labels.to_csv(os.path.join(temp_dir, 'labels.tsv'), index=False, sep='\t')
+    # ids_to_take = test_labels['EntryID'].drop_duplicates().values
 
     test_goa_data = [
         get_labels(
@@ -245,14 +263,19 @@ if __name__ == '__main__':
         config['train_params']['store_swa'], path=swa_dir, rewrite=True
     )
 
-    evaluator = CAFA6Evaluator(
+    evaluator = CAFA6x3Evaluator(
         args.graph_path,
         args.ia_path,
         temp_dir=temp_dir,
         G=G,
         idx=ids_to_take,
-        train_terms=os.path.join(args.elabels_path, 'test_leak_terms.tsv')
+        train_terms=args.train_terms,
+        test_terms=args.test_path
     )
+
+    # test evaluation
+    score = evaluator(model, val_dl)
+    print('Test score value: ', score)
 
     ############################################
     # FIT AND SAVE
