@@ -95,7 +95,7 @@ if __name__ == '__main__':
     with open(args.config, 'r') as f:
         config = yaml.safe_load(f)
 
-    set_num_threads(config['train_params']['num_workers'])
+    set_num_threads(min(os.cpu_count(), config['train_params']['num_workers']))
 
     graph_path = args.graph_path
     ia_path = args.ia_path
