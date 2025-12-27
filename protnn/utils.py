@@ -316,7 +316,8 @@ class CAFA6Evaluator:
             -ia {self.ia_path} \
             -no_orphans \
             -prop fill \
-            -out_dir {os.path.join(self.temp_dir, 'results')}
+            -out_dir {os.path.join(self.temp_dir, 'results')} \
+            -max
         """
         subprocess.check_call(script, shell=True)
 
@@ -371,7 +372,9 @@ class CAFA6x3Evaluator:
                     -ia {self.ia_path} \
                     -no_orphans \
                     -prop fill \
-                    -out_dir {os.path.join(self.temp_dir, 'results')}
+                    -out_dir {os.path.join(self.temp_dir, 'results')} \
+                    -max_terms 500 \
+                    -th_step 0.01
                 """
             else:
 
@@ -382,7 +385,9 @@ class CAFA6x3Evaluator:
                     -ia {self.ia_path} \
                     -no_orphans \
                     -prop fill \
-                    -out_dir {os.path.join(self.temp_dir, 'results')}
+                    -out_dir {os.path.join(self.temp_dir, 'results')} \
+                    -max_terms 500 \
+                    -th_step 0.01
                 """
             subprocess.check_call(script, shell=True)
 
