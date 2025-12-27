@@ -375,7 +375,7 @@ class CAFA6x3Evaluator:
                     -out_dir {os.path.join(self.temp_dir, 'results')} \
                     -max_terms 500 \
                     -th_step 0.01 \
-                    -threads 3
+                    -threads 1
                 """
             else:
 
@@ -389,7 +389,7 @@ class CAFA6x3Evaluator:
                     -out_dir {os.path.join(self.temp_dir, 'results')} \
                     -max_terms 500 \
                     -th_step 0.01 \
-                    -threads 3
+                    -threads 1
                 """
             subprocess.check_call(script, shell=True)
 
