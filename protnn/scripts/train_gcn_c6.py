@@ -79,18 +79,18 @@ if __name__ == '__main__':
     from torch import nn
     from torch.utils.data import Dataset, DataLoader
 
-    try:
-        from protlib.metric import obo_parser, Graph, ia_parser, get_topk_targets, get_depths
-        from protnn.utils import get_labels, CAFAEvaluator, estimate_prior, Prediction, make_raw_prediction, \
-            make_submission, CAFA6x3Evaluator
+    # try:
+    from protlib.metric import obo_parser, Graph, ia_parser, get_topk_targets, get_depths
+    from protnn.utils import get_labels, CAFAEvaluator, estimate_prior, Prediction, make_raw_prediction, \
+        make_submission, CAFA6x3Evaluator
 
-        from protnn.dataset import *
-        from protnn.stacker import *
-        from protnn.swa import SWA
+    from protnn.dataset import *
+    from protnn.stacker import *
+    from protnn.swa import SWA
 
-    except ImportError:
-        print('Alarm')
-        pass
+    # except ImportError:
+    #     print('Alarm')
+    #     pass
 
     with open(args.config, 'r') as f:
         config = yaml.safe_load(f)
