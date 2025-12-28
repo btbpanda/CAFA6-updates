@@ -14,6 +14,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-g', '--graph-path', type=str)
 parser.add_argument('-el', '--elabels-path', type=str)
 parser.add_argument('-m', '--model-path', type=str)
+parser.add_argument('-tm', '--test-mode', type=str, default='226')
+
 parser.add_argument('-out', '--output', type=str)
 
 parser.add_argument('-o', '--ontology', type=str, nargs='+',default=['bp', 'mf', 'cc'])
@@ -59,6 +61,17 @@ if __name__ == '__main__':
     ontologies = []
     for ns, terms_dict in obo_parser(graph_path).items():
         ontologies.append(Graph(ns, terms_dict, None, True))
+
+    postfix = args.test_mode
+    # if not a number, '_' is used to define the mode...
+    try:
+        int(postfix)
+    except ValueError:
+        postfix = '_' + postfix
+
+
+    elabels_path = os.path.join(args.elabels_path, f'test_auto{postfix}.tsv')
+
 
     for n, ontology in enumerate(args.ontology):
         # mode = 'w' if n == 0 else 'a'
@@ -119,8 +132,7 @@ if __name__ == '__main__':
 
                 test_goa_data = [
                     get_labels(
-                        path=os.path.join(args.elabels_path, 'test_auto226.tsv'),
-                        G=G, idx=test_id
+                        path=elabels_path, G=G, idx=test_id
                     )
                 ]
 
