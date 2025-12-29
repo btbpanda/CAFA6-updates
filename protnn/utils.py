@@ -337,13 +337,7 @@ class CAFA6x3Evaluator:
         self.train_terms = train_terms
         self.idx = idx
 
-    def __call__(self, model, dl, topk=500, tau=0.01):
-        sub_file = os.path.join(self.temp_dir, 'prediction', 'sub.tsv')
-        os.makedirs(os.path.dirname(sub_file), exist_ok=True)
-
-        make_submission(
-            model, dl, self.G, self.idx, sub_file, mode='w', topk=topk, tau=tau
-        )
+    def evaluate(self, sub_file, ):
 
         scores = []
 
@@ -365,40 +359,51 @@ class CAFA6x3Evaluator:
                 )
 
                 script = f"""cafaeval \
-                    {self.graph_path} \
-                    {os.path.dirname(sub_file)} \
-                    {new_terms_file} \
-                    -known {self.train_terms} \
-                    -ia {self.ia_path} \
-                    -no_orphans \
-                    -prop fill \
-                    -out_dir {os.path.join(self.temp_dir, 'results')} \
-                    -max_terms 500 \
-                    -th_step 0.01 \
-                    -threads 4
-                """
+                            {self.graph_path} \
+                            {os.path.dirname(sub_file)} \
+                            {new_terms_file} \
+                            -known {self.train_terms} \
+                            -ia {self.ia_path} \
+                            -no_orphans \
+                            -prop fill \
+                            -out_dir {os.path.join(self.temp_dir, 'results')} \
+                            -max_terms 500 \
+                            -th_step 0.01 \
+                            -threads 4
+                        """
             else:
 
                 script = f"""cafaeval \
-                    {self.graph_path} \
-                    {os.path.dirname(sub_file)} \
-                    {terms_file} \
-                    -ia {self.ia_path} \
-                    -no_orphans \
-                    -prop fill \
-                    -out_dir {os.path.join(self.temp_dir, 'results')} \
-                    -max_terms 500 \
-                    -th_step 0.01 \
-                    -threads 4
-                """
+                            {self.graph_path} \
+                            {os.path.dirname(sub_file)} \
+                            {terms_file} \
+                            -ia {self.ia_path} \
+                            -no_orphans \
+                            -prop fill \
+                            -out_dir {os.path.join(self.temp_dir, 'results')} \
+                            -max_terms 500 \
+                            -th_step 0.01 \
+                            -threads 4
+                        """
             subprocess.check_call(script, shell=True)
 
             df = pd.read_csv(os.path.join(self.temp_dir, 'results', 'evaluation_best_f_w.tsv', ), sep='\t')
             score = df.groupby('ns')['f_w'].max().to_dict()
-            score =  score[self.G.namespace]
+            score = score[self.G.namespace]
 
             scores.append(score)
 
             print(f'F1 {self.G.namespace} {test_file}: ', score)
 
         return np.mean(scores)
+
+
+    def __call__(self, model, dl, topk=500, tau=0.01):
+        sub_file = os.path.join(self.temp_dir, 'prediction', 'sub.tsv')
+        os.makedirs(os.path.dirname(sub_file), exist_ok=True)
+
+        make_submission(
+            model, dl, self.G, self.idx, sub_file, mode='w', topk=topk, tau=tau
+        )
+
+        return self.evaluate(sub_file, )
