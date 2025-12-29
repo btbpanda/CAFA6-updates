@@ -19,6 +19,10 @@ parser.add_argument('-tm', '--test-mode', type=str, default='226')
 parser.add_argument('-out', '--output', type=str)
 
 parser.add_argument('-o', '--ontology', type=str, nargs='+',default=['bp', 'mf', 'cc'])
+parser.add_argument('-tk', '--topk', type=int, default=500)
+parser.add_argument('-t', '--tau', type=float, default=0.01)
+
+
 parser.add_argument('-d', '--devices', type=int, nargs='+')
 
 
@@ -155,8 +159,8 @@ if __name__ == '__main__':
                     test_id,
                     output_path,
                     mode=mode,
-                    topk=500,
-                    tau=0.01
+                    topk=args.topk,
+                    tau=args.tau
                 )
 
 
