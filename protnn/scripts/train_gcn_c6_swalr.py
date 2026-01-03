@@ -31,16 +31,19 @@ parser.add_argument('-d', '--devices', type=int, nargs='+')
 
 ont_dict = {'bp': 0, 'mf': 1, 'cc': 2}
 
-def train_gcn(model, train_dl, val_dl, evaluator, n_ep=20, lr=1e-3, clip_grad=10, weight_decay=1e-5, 
-              swa_start=5, swa_lr=3e-4, eval_frequency=None):
+def train_gcn(model, train_dl, val_dl, evaluator, n_ep=20, lr=1e-3, clip_grad=1, 
+              weight_decay=1e-2, swa_start=5, swa_lr=5e-4, swa_mode='cyclic', 
+              eval_frequency=None):
     """
-    Train GCN with SWALR and cosine annealing
-    Evaluate CAFA5 metrics only at specified frequency (or only at the end if None)
+    Train GCN with SWALR and flexible LR schedule
     
     Args:
-        eval_frequency: Evaluate every N epochs. If None, evaluate only at the end.
+        swa_mode: 'constant', 'cyclic', or 'cosine'
+            - constant: fixed LR during SWA (fastest, simple)
+            - cyclic: cyclic LR during SWA (better, recommended)
+            - cosine: continue cosine annealing (smoothest)
     """
-    opt = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
+    opt = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
     loss_fn = nn.BCEWithLogitsLoss()
     
     # Initialize SWALR wrapper
@@ -48,9 +51,10 @@ def train_gcn(model, train_dl, val_dl, evaluator, n_ep=20, lr=1e-3, clip_grad=10
     swa_wrapper = SWALRWrapper(
         model, opt, 
         swa_start=swa_start, 
-        swa_lr=swa_lr, 
+        swa_lr=swa_lr,
         anneal_epochs=swa_start,
-        anneal_strategy='cos'
+        swa_mode=swa_mode,
+        cycle_epochs=1  # cycle every epoch for cyclic mode
     )
     swa_wrapper.set_train_loader(train_dl)
     
@@ -69,10 +73,16 @@ def train_gcn(model, train_dl, val_dl, evaluator, n_ep=20, lr=1e-3, clip_grad=10
 
             output = model(batch)
             loss = loss_fn(output, batch['y'])
+            
+            # Check for NaN loss
+            if torch.isnan(loss):
+                print(f"Warning: NaN loss detected at epoch {epoch+1}")
+                continue
+                
             loss.backward()
 
             if clip_grad is not None:
-                nn.utils.clip_grad_value_(model.parameters(), clip_value=clip_grad)
+                nn.utils.clip_grad_norm_(model.parameters(), max_norm=clip_grad)
             opt.step()
             
             epoch_loss += loss.item()
@@ -83,21 +93,23 @@ def train_gcn(model, train_dl, val_dl, evaluator, n_ep=20, lr=1e-3, clip_grad=10
         swa_wrapper.step(model)
         
         # Get current learning rate
-        current_lr = opt.param_groups[0]['lr']
+        current_lr = swa_wrapper.get_current_lr()
         avg_loss = epoch_loss / n_batches
-        print(f'Epoch {epoch+1}/{n_ep}: Loss = {avg_loss:.4f}, LR = {current_lr:.6f}')
+        
+        # Indicate SWA phase
+        phase = "SWA" if epoch >= swa_start else "Warmup"
+        print(f'Epoch {epoch+1}/{n_ep} [{phase}]: Loss = {avg_loss:.4f}, LR = {current_lr:.6f}')
         
         # Evaluate based on frequency
         should_evaluate = False
         if eval_frequency is not None and (epoch + 1) % eval_frequency == 0:
             should_evaluate = True
-        elif eval_frequency is None and epoch == n_ep - 1:  # Only last epoch
+        elif eval_frequency is None and epoch == n_ep - 1:
             should_evaluate = True
             
         if should_evaluate:
             print(f'Evaluating at epoch {epoch+1}...')
             if epoch >= swa_start:
-                # Use SWA model for evaluation
                 eval_model = swa_wrapper.swa_model
                 print('Using SWA model for evaluation')
             else:
@@ -110,7 +122,14 @@ def train_gcn(model, train_dl, val_dl, evaluator, n_ep=20, lr=1e-3, clip_grad=10
             print(f'Epoch {epoch+1}: CAFA5 score = {score:.4f}')
     
     # Get final model
-    final_model = swa_wrapper.get_final_model(model)
+    if n_ep > swa_start:
+        print("Updating batch norm for final SWA model...")
+        torch.optim.swa_utils.update_bn(train_dl, swa_wrapper.swa_model)
+        final_model = swa_wrapper.swa_model
+        print("Returning SWA model")
+    else:
+        final_model = model
+        print("Returning regular model")
     
     print(f'\nTraining completed!')
     if scores:
@@ -329,7 +348,7 @@ if __name__ == '__main__':
     # Set eval_frequency to None to evaluate only at the end
     # Or set to a number (e.g., 5) to evaluate every N epochs
     eval_frequency = config['train_params'].get('eval_frequency', None)
-    
+
     model, scores = train_gcn(
         model,
         train_dl,
@@ -340,8 +359,9 @@ if __name__ == '__main__':
         clip_grad=config['train_params']['clip_grad'],
         weight_decay=config['train_params']['weight_decay'],
         swa_start=config['train_params'].get('swa_start', 5),
-        swa_lr=config['train_params'].get('swa_lr', 0.05),
-        eval_frequency=eval_frequency  # None = only at end, N = every N epochs
+        swa_lr=config['train_params'].get('swa_lr', 5e-4),
+        swa_mode=config['train_params'].get('swa_mode', 'cyclic'),  # NEW!
+        eval_frequency=eval_frequency
     )
 
     if type(model) is nn.DataParallel:

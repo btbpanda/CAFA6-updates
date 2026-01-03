@@ -10,10 +10,12 @@ train_params:
   batch_size: 32
   test_batch_size: 512
   eval_frequency: 5
+  clip_grad: 0.1
+  swa_start: 5
   swa_lr: 0.0005
+  swa_mode: 'cyclic'  # 'constant', 'cyclic', or 'cosine'
 
   lr: 0.001
-  clip_grad: 10.0
   weight_decay: 0.0001
 
   hidden_size: 16
