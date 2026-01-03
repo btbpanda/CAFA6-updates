@@ -31,8 +31,8 @@ parser.add_argument('-d', '--devices', type=int, nargs='+')
 
 ont_dict = {'bp': 0, 'mf': 1, 'cc': 2}
 
-def train_gcn(model, train_dl, val_dl, evaluator, n_ep=20, lr=1e-3, clip_grad=1, weight_decay=1e-2, 
-              swa_start=5, swa_lr=0.05, eval_frequency=None):
+def train_gcn(model, train_dl, val_dl, evaluator, n_ep=20, lr=1e-3, clip_grad=10, weight_decay=1e-5, 
+              swa_start=5, swa_lr=3e-4, eval_frequency=None):
     """
     Train GCN with SWALR and cosine annealing
     Evaluate CAFA5 metrics only at specified frequency (or only at the end if None)

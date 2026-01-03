@@ -36,6 +36,53 @@ def get_params_from_cfg(path):
 
     return params
 
+
+def load_model_from_checkpoint(checkpoint_path, model):
+    """
+    Load model from checkpoint, handling both regular and SWA models
+    """
+    state_dict = torch.load(checkpoint_path, map_location='cpu')
+    
+    print(f"Original state_dict has {len(state_dict)} keys")
+    print(f"Sample keys: {list(state_dict.keys())[:3]}")
+    
+    # Clean up state dict from wrappers
+    cleaned_state_dict = {}
+    
+    for key, value in state_dict.items():
+        # Skip special keys from AveragedModel
+        if key == 'n_averaged':
+            continue
+            
+        new_key = key
+        
+        # Remove all 'module.' prefixes (from both DataParallel and AveragedModel)
+        while new_key.startswith('module.'):
+            new_key = new_key[7:]  # Remove 'module.' prefix
+        
+        cleaned_state_dict[new_key] = value
+    
+    print(f"Cleaned state_dict has {len(cleaned_state_dict)} keys")
+    print(f"Sample cleaned keys: {list(cleaned_state_dict.keys())[:3]}")
+    
+    # Load state dict
+    try:
+        model.load_state_dict(cleaned_state_dict, strict=True)
+        print("Model loaded successfully (strict mode)")
+    except RuntimeError as e:
+        print(f"Warning: {e}")
+        print("Trying to load with strict=False...")
+        missing_keys, unexpected_keys = model.load_state_dict(cleaned_state_dict, strict=False)
+        print(f"Missing keys: {len(missing_keys)}")
+        print(f"Unexpected keys: {len(unexpected_keys)}")
+        if missing_keys:
+            print(f"First few missing: {missing_keys[:5]}")
+        if unexpected_keys:
+            print(f"First few unexpected: {unexpected_keys[:5]}")
+    
+    return model
+
+
 if __name__ == '__main__':
 
     args = parser.parse_args()
@@ -90,18 +137,21 @@ if __name__ == '__main__':
             hidden_size=cfg['train_params']['hidden_size'],
             n_layers=cfg['train_params']['n_layers'],
             embed_size=cfg['train_params']['embed_size']
-        ).cuda()
+        )
         
         # Load trained weights
         checkpoint_path = os.path.join(model_path, 'checkpoint.pth')
         if not os.path.exists(checkpoint_path):
             raise FileNotFoundError(f"Checkpoint not found: {checkpoint_path}")
         
-        state_dict = torch.load(checkpoint_path)
-        model.load_state_dict(state_dict)
-        model.eval()  # Set to evaluation mode
+        print(f"Loading model from {checkpoint_path}")
+        model = load_model_from_checkpoint(checkpoint_path, model)
         
-        print(f"Loaded model from {checkpoint_path}")
+        # Move to GPU and set to eval mode
+        model = model.cuda()
+        model.eval()
+        
+        print(f"Model loaded successfully")
 
         # Multi-GPU support
         if len(args.devices) > 1:
@@ -183,7 +233,7 @@ if __name__ == '__main__':
                 )
 
                 # Generate predictions
-                with torch.no_grad():  # Ensure no gradients are computed
+                with torch.no_grad():
                     make_submission(
                         model,
                         test_dl,
