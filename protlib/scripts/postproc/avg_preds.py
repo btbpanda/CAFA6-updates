@@ -52,14 +52,14 @@ if __name__ == '__main__':
             schema={'EntryID': pl.Categorical, 'term': pl.Categorical, 'p': pl.Float32}
         )
 
-    pred = cudf.from_pandas(
-        pl.concat([pred_max, pred_min]).to_pandas()
-    )
+        pred = cudf.from_pandas(
+            pl.concat([pred_max, pred_min]).to_pandas()
+        )
 
     pred = pred.groupby(['EntryID', 'term'])['p'].mean().reset_index().sort_values(['EntryID', 'p'], ascending=False)
 
     write_csv_batch(
-        pred, args.output_path, 
+        pred, args.output_path,
         mode='w', batch_size=10000000,
         sep='\t', header=False, index=False
     )
