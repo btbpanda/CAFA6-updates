@@ -111,10 +111,11 @@ if __name__ == '__main__':
     for ns, terms_dict in obo_parser(graph_path).items():
         ontologies.append(Graph(ns, terms_dict, None, True))
 
-    back_prot_id = trainTerms['EntryID'].drop_duplicates().reset_index(drop=True)
+    back_prot_id = trainTerms['EntryID'].drop_duplicates().astype(str).reset_index(drop=True)
     length = len(back_prot_id)
-    prot_id = cudf.Series(cp.arange(length), back_prot_id)
-    trainTerms['id'] = trainTerms['EntryID'].map(prot_id)
+    # prot_id = cudf.Series(cp.arange(length), back_prot_id)
+    # trainTerms['id'] = trainTerms['EntryID'].map(prot_id)
+    trainTerms['id'] = trainTerms['EntryID'].cat.codes
 
     flg = True
 
