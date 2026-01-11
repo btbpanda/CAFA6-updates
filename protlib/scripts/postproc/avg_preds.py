@@ -40,21 +40,23 @@ if __name__ == '__main__':
     except Exception:
         get_funcs_mapper, get_ns_id, obo_parser, Graph = [None] * 4
 
-    with pl.StringCache():
+    # with pl.StringCache():
 
-        pred_max = pl.read_csv(
-            args.input_max, has_header=False, separator='\t', new_columns=['EntryID', 'term', 'p'],
-            schema={'EntryID': pl.Categorical, 'term': pl.Categorical, 'p': pl.Float32}
-        )
+    pred_max = pl.read_csv(
+        args.input_max, has_header=False, separator='\t', new_columns=['EntryID', 'term', 'p'],
+        # schema={'EntryID': pl.Categorical, 'term': pl.Categorical, 'p': pl.Float32},
+        schema={'EntryID': pl.String, 'term': pl.String, 'p': pl.Float32}
+    )
 
-        pred_min = pl.read_csv(
-            args.input_min, has_header=False, separator='\t', new_columns=['EntryID', 'term', 'p'],
-            schema={'EntryID': pl.Categorical, 'term': pl.Categorical, 'p': pl.Float32}
-        )
+    pred_min = pl.read_csv(
+        args.input_min, has_header=False, separator='\t', new_columns=['EntryID', 'term', 'p'],
+        # schema={'EntryID': pl.Categorical, 'term': pl.Categorical, 'p': pl.Float32},
+        schema = {'EntryID': pl.String, 'term': pl.String, 'p': pl.Float32}
+    )
 
-        pred = cudf.from_pandas(
-            pl.concat([pred_max, pred_min]).to_pandas()
-        )
+    pred = cudf.from_pandas(
+        pl.concat([pred_max, pred_min]).to_pandas()
+    )
 
     pred = pred.groupby(['EntryID', 'term'])['p'].mean().reset_index().sort_values(['EntryID', 'p'], ascending=False)
 
