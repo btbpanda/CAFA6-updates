@@ -99,7 +99,8 @@ if __name__ == '__main__':
 
     trainTerms = pl.read_csv(
         input_path, has_header=False, separator='\t', new_columns=['EntryID', 'term', 'prob'],
-        schema={'EntryID': pl.Categorical, 'term': pl.Categorical, 'prob': pl.Float32}
+        # schema={'EntryID': pl.Categorical, 'term': pl.Categorical, 'prob': pl.Float32}
+        schema = {'EntryID': pl.String, 'term': pl.String, 'prob': pl.Float32}
     )
 
     trainTerms = cudf.from_pandas(
