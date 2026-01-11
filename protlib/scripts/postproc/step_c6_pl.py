@@ -98,14 +98,14 @@ if __name__ == '__main__':
     output_path = args.output_path # os.path.join(pp_path, f'pred_{args.direction}.tsv')
 
     trainTerms = pl.read_csv(
-        input_path, has_header=False, separator='\t', new_columns=['EntryID', 'term', 'p'],
+        input_path, has_header=False, separator='\t', new_columns=['EntryID', 'term', 'prob'],
         schema={'EntryID': pl.Categorical, 'term': pl.Categorical, 'p': pl.Float32}
     )
 
     trainTerms = cudf.from_pandas(
         trainTerms.to_pandas(),
     )
-    
+
     ontologies = []
     for ns, terms_dict in obo_parser(graph_path).items():
         ontologies.append(Graph(ns, terms_dict, None, True))
