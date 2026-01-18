@@ -96,7 +96,9 @@ class StackDataset(Dataset):
         self.goa = [x.tolist() for x in goa_list]
         self.p_goa = p_goa
 
-        self.gt = gt.tolist()
+        self.gt = None
+        if gt is not None:
+            self.gt = gt.tolist()
         self.p_gt = p_gt
 
         self.targets = targets
