@@ -20,7 +20,7 @@ parser.add_argument('-to', '--target-old-path', type=str)
 parser.add_argument('-el', '--elabels-path', type=str)
 parser.add_argument('-tl', '--test-path', type=str)
 parser.add_argument('-tt', '--train-terms', type=str)
-parser.add_argument('-pt', '--prop-terms', type=str)
+parser.add_argument('-pt', '--prop-terms', type=str, default='')
 
 parser.add_argument('-f', '--fasta', type=str)
 parser.add_argument('-out', '--output', type=str)
@@ -229,10 +229,12 @@ if __name__ == '__main__':
         ) for model_path in config['models']
     ]
 
-    test_gt_data = get_labels(
-        path=args.prop_terms,
-        G=G, idx=ids_to_take
-    )
+    test_gt_data = None
+    if args.prop_terms != '':
+        test_gt_data = get_labels(
+            path=args.prop_terms,
+            G=G, idx=ids_to_take
+        )
 
     ############################################
     # DEFINE MODEL

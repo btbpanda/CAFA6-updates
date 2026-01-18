@@ -88,7 +88,7 @@ def get_dag_dense(G, direction='all', self_loop=True):
 
 class StackDataset(Dataset):
 
-    def __init__(self, preds, G, goa_list, p_goa=1, targets=None, gt=None, p_gt=0.3):
+    def __init__(self, preds, G, goa_list, p_goa=1, targets=None, gt=None, p_gt=0.0):
 
         self.preds = preds
         self.G = G
