@@ -225,7 +225,10 @@ class ComposedBCELoss(nn.Module):
 
         loss_cond = self.loss_cond(p_cond, gt)
         loss_cond = (loss_cond * cond_mask).sum() / cond_mask.sum()
+        loss_raw = self.loss_raw(p_raw, gt)
 
-        return loss_cond * self.cond_rate + self.loss_raw(p_raw, gt)
+        print(loss_cond, loss_raw)
+
+        return loss_cond * self.cond_rate + loss_raw
 
 
