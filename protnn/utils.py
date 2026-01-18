@@ -147,7 +147,7 @@ def make_raw_prediction(model, dl):
     return pred
 
 
-def make_submission(model, dl, G, idx, path, mode='w', topk=500, tau=0.01):
+def make_submission(model, dl, G, idx, path, mode='w', cnd=False, topk=500, tau=0.01):
 
     os.makedirs(os.path.dirname(path), exist_ok=True)
 
@@ -159,7 +159,11 @@ def make_submission(model, dl, G, idx, path, mode='w', topk=500, tau=0.01):
     with torch.no_grad():
         for n, batch in enumerate(tqdm.tqdm(dl)):
             batch = {x: batch[x].cuda() for x in batch}
-            pred = model(batch).sigmoid()
+            pred = model(batch)
+            if cnd:
+                pred = pred[1]
+            else:
+                pred = pred.sigmoid()
 
             order = pred.argsort(dim=1, descending=True)[:, :topk]
             pred = torch.gather(pred, 1, order).detach().cpu().numpy().ravel()
@@ -328,7 +332,7 @@ class CAFA6Evaluator:
 
 class CAFA6x3Evaluator:
 
-    def __init__(self, graph_path, ia_path, temp_dir, G, idx, test_terms, train_terms, ):
+    def __init__(self, graph_path, ia_path, temp_dir, G, idx, test_terms, train_terms, cnd=False):
         self.G = G
         self.graph_path = graph_path
         self.ia_path = ia_path
@@ -336,6 +340,7 @@ class CAFA6x3Evaluator:
         self.test_terms = test_terms
         self.train_terms = train_terms
         self.idx = idx
+        self.cnd = cnd
 
     def evaluate(self, sub_file, ):
 
@@ -403,7 +408,7 @@ class CAFA6x3Evaluator:
         os.makedirs(os.path.dirname(sub_file), exist_ok=True)
 
         make_submission(
-            model, dl, self.G, self.idx, sub_file, mode='w', topk=topk, tau=tau
+            model, dl, self.G, self.idx, sub_file, mode='w', cnd=self.cnd, topk=topk, tau=tau
         )
 
         return self.evaluate(sub_file, )

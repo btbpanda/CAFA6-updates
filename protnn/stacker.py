@@ -1,6 +1,11 @@
 import torch
 from torch import nn
 
+try:
+    from protlib.metric import get_depths
+except ImportError:
+    get_depths = None
+
 def get_dag_dense(G, direction='all', self_loop=True):
     dst, src = [], []
 
@@ -131,3 +136,96 @@ class GCNStacker(nn.Module):
 
         x = self.clf(x)[..., 0]  # + self.bias  # n_samples * n_nodes * n_features
         return x
+
+
+class PropLevel(nn.Module):
+
+    def __init__(self, idxs, G):
+        super().__init__()
+        src, dst_lvl, dst = [], [], []
+
+        for n, i in enumerate(idxs):
+            adj = G.terms_list[i]['adj']
+            src.extend(adj)
+            dst_lvl.extend([n] * len(adj))
+            dst.append(i)
+
+        self.register_buffer('src', torch.tensor(src, dtype=torch.long))
+        self.register_buffer('dst_lvl', torch.tensor(dst_lvl, dtype=torch.long))
+        self.register_buffer('dst', torch.tensor(dst, dtype=torch.long))
+
+    def forward(self, p_cond, p_raw, gt=None):
+
+        p_par = torch.empty((len(p_cond), len(self.dst)), dtype=p_cond.dtype, device=p_cond.device)
+        p_src = p_raw[:, self.src]
+
+        if gt is not None:
+            p_src = torch.maximum(p_src, gt[:, self.src])
+
+        p_par = 1 - p_par.index_reduce(1, self.dst_lvl, 1 - p_src, reduce='prod', include_self=False)
+
+        p_raw = p_raw.clone()
+        p_raw[:, self.dst] = p_par * p_cond[:, self.dst]
+
+        return p_raw
+
+
+class GraphProp(nn.Module):
+
+    def __init__(self, G):
+        super().__init__()
+
+        D = get_depths(G)
+        self.levels = nn.ModuleList()
+
+        for i in range(len(D)):
+            self.levels.append(
+                PropLevel(D[i], G)
+            )
+
+    def forward(self, p_cond, gt=None):
+
+        p_raw = torch.ones_like(p_cond)
+        for level in self.levels:
+            p_raw = level(p_cond, p_raw, gt)
+
+        return p_raw
+
+class GCNStackerCND(nn.Module):
+    def __init__(self, in_models, in_goa, graph, hidden_size=16, n_layers=8, embed_size=16):
+        super().__init__()
+
+        self.stacker = GCNStacker(in_models, in_goa, graph, hidden_size, n_layers, embed_size)
+        self.act = nn.Sigmoid()
+        self.cond_prop = GraphProp(graph)
+
+    def forward(self, batch):
+        p_cond = self.stacker(batch)
+        p_cond = self.act(p_cond)
+
+        p_raw = self.cond_prop(p_cond)
+
+        return p_cond, p_raw
+
+
+class ComposedBCELoss(nn.Module):
+
+    def __init__(self, cond_rate=0.3):
+
+        super().__init__()
+        self.cond_rate = cond_rate
+        self.loss_cond = nn.BCELoss(reduction='none')
+        self.loss_raw = nn.BCELoss(reduction='mean')
+
+    def forward(self, p_cond, p_raw, gt):
+
+        cond_mask = ~torch.isnan(gt)
+        gt = torch.where(cond_mask, gt, 0)
+        cond_mask = cond_mask.type(p_cond.dtype)
+
+        loss_cond = self.loss_cond(p_cond, gt)
+        loss_cond = (loss_cond * cond_mask).sum() / cond_mask.sum()
+
+        return loss_cond * self.cond_rate + self.loss_raw(p_raw, gt)
+
+

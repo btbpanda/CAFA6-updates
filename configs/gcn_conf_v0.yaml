@@ -6,6 +6,7 @@ train_params:
   store_swa: 10
   use_swa: 3
   p_goa: 0.5
+  p_gt: 0.3
   num_workers: 8
   batch_size: 32
   test_batch_size: 512
@@ -13,6 +14,7 @@ train_params:
   lr: 0.001
   clip_grad: 0.1
   weight_decay: 0.00001
+  cond_rate: 0.3
 
   hidden_size: 16
   n_layers: 8

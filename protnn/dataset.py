@@ -88,13 +88,16 @@ def get_dag_dense(G, direction='all', self_loop=True):
 
 class StackDataset(Dataset):
 
-    def __init__(self, preds, G, goa_list, p_goa=1, targets=None):
+    def __init__(self, preds, G, goa_list, p_goa=1, targets=None, gt=None, p_gt=0.3):
 
         self.preds = preds
         self.G = G
         self.nout = len(G.terms_list)
         self.goa = [x.tolist() for x in goa_list]
         self.p_goa = p_goa
+
+        self.gt = gt.tolist()
+        self.p_gt = p_gt
 
         self.targets = targets
         self.adj = [np.array(x['adj'], dtype=np.int64) for x in G.terms_list]
@@ -127,11 +130,11 @@ class StackDataset(Dataset):
         x_goa = []
 
         goa = np.zeros((len(self.goa), self.nout), dtype=np.float32)
-        # if np.random.rand() < self.p_goa:
-        for n, ann in enumerate(self.goa):
-            ann = ann[index]
-            if len(ann) > 0:
-                goa[n, ann] = 1
+        if np.random.rand() < self.p_goa:
+            for n, ann in enumerate(self.goa):
+                ann = ann[index]
+                if len(ann) > 0:
+                    goa[n, ann] = 1
         x_goa.append(torch.from_numpy(goa))
 
         batch['goa'] = torch.cat(x_goa, dim=0).swapaxes(0, 1)
@@ -140,6 +143,18 @@ class StackDataset(Dataset):
 
         if self.targets is not None:
             batch['y'] = torch.from_numpy(self.targets[index])
+
+        gt = None
+        if self.gt is not None:
+            gt = torch.zeros(self.nout, dtype=torch.float32)
+            ann = self.gt[index]
+            gt[ann] = 1
+        else:
+            if np.random.rand() < self.p_gt:
+                gt = batch['y'].nan_to_num(nan=0)
+
+        if gt is not None:
+            batch['gt'] = gt
 
         return batch
 

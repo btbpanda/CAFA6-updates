@@ -20,6 +20,7 @@ parser.add_argument('-to', '--target-old-path', type=str)
 parser.add_argument('-el', '--elabels-path', type=str)
 parser.add_argument('-tl', '--test-path', type=str)
 parser.add_argument('-tt', '--train-terms', type=str)
+parser.add_argument('-pt', '--prop-terms', type=str)
 
 parser.add_argument('-f', '--fasta', type=str)
 parser.add_argument('-out', '--output', type=str)
@@ -37,9 +38,9 @@ parser.add_argument('-d', '--devices', type=int, nargs='+')
 
 ont_dict = {'bp': 0, 'mf': 1, 'cc': 2}
 
-def train_gcn(model, swa, train_dl, val_dl, evaluator, n_ep=20, lr=1e-3, clip_grad=1, weight_decay=1e-2):
+def train_gcn(model, swa, train_dl, val_dl, evaluator, n_ep=20, lr=1e-3, clip_grad=1, weight_decay=1e-2, cond_rate=0.3):
     opt = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
-    loss_fn = nn.BCEWithLogitsLoss()
+    loss_fn = ComposedBCELoss(cond_rate) # nn.BCEWithLogitsLoss()
 
     scores = []
     for n in range(n_ep):
@@ -49,8 +50,8 @@ def train_gcn(model, swa, train_dl, val_dl, evaluator, n_ep=20, lr=1e-3, clip_gr
             batch = {x: batch[x].cuda() for x in batch}
             opt.zero_grad()
 
-            output = model(batch)
-            loss = loss_fn(output, batch['y'])
+            p_cond, p_raw = model(batch)
+            loss = loss_fn(p_cond, p_raw, batch['y'])
             loss.backward()
 
             if clip_grad is not None:
@@ -163,7 +164,7 @@ if __name__ == '__main__':
     target = pd.read_parquet(
         target_path,
         columns=[x['id'] for x in G.terms_list]
-    ).fillna(0)
+    )
 
     train_sl = np.nonzero(target[root_id].values == 1)[0]
     target = target.values[train_sl]
@@ -228,6 +229,11 @@ if __name__ == '__main__':
         ) for model_path in config['models']
     ]
 
+    test_gt_data = get_labels(
+        path=args.prop_terms,
+        G=G, idx=ids_to_take
+    )
+
     ############################################
     # DEFINE MODEL
     ############################################
@@ -236,7 +242,8 @@ if __name__ == '__main__':
         G,
         goa_list=goa_data,
         p_goa=config['train_params']['p_goa'],
-        targets=target
+        targets=target,
+        p_gt=config['train_params']['p_gt']
     )
     train_dl = DataLoader(
         train_ds, batch_size=config['train_params']['batch_size'], shuffle=True,
@@ -248,14 +255,16 @@ if __name__ == '__main__':
         G,
         goa_list=test_goa_data,
         p_goa=1,
-        targets=None
+        targets=None,
+        gt=test_gt_data,
     )
+
     val_dl = DataLoader(
         val_ds, batch_size=config['train_params']['test_batch_size'], shuffle=False,
         num_workers=min(os.cpu_count(), config['train_params']['num_workers'])
     )
 
-    model = GCNStacker(
+    model = GCNStackerCND(
         len(config['models']), 1, G,
         hidden_size=config['train_params']['hidden_size'],
         n_layers=config['train_params']['n_layers'],
@@ -276,7 +285,8 @@ if __name__ == '__main__':
         G=G,
         idx=ids_to_take,
         train_terms=args.train_terms,
-        test_terms=args.test_path
+        test_terms=args.test_path,
+        cnd=True
     )
 
     # test evaluation
@@ -295,7 +305,8 @@ if __name__ == '__main__':
         n_ep=config['train_params']['n_ep'],
         lr=config['train_params']['lr'],
         clip_grad=config['train_params']['clip_grad'],
-        weight_decay=config['train_params']['weight_decay']
+        weight_decay=config['train_params']['weight_decay'],
+        cond_rate=config['train_params']['cond_rate'],
     )
     joblib.dump(swa, os.path.join(work_dir, f'swa.pkl'))
 
