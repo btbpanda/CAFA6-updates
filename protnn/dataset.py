@@ -152,7 +152,7 @@ class StackDataset(Dataset):
             ann = self.gt[index]
             gt[ann] = 1
         else:
-            if np.random.rand() < self.p_gt:
+            if ('y' in batch) and (np.random.rand() < self.p_gt):
                 gt = batch['y'].nan_to_num(nan=0)
             else:
                 gt = torch.zeros(self.nout, dtype=torch.float32)
