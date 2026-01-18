@@ -280,8 +280,8 @@ if __name__ == '__main__':
     )
 
     # test evaluation
-    score = evaluator(model, val_dl)
-    print('Test score value: ', score)
+    # score = evaluator(model, val_dl)
+    # print('Test score value: ', score)
 
     ############################################
     # FIT AND SAVE
