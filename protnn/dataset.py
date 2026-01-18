@@ -154,6 +154,8 @@ class StackDataset(Dataset):
         else:
             if np.random.rand() < self.p_gt:
                 gt = batch['y'].nan_to_num(nan=0)
+            else:
+                gt = torch.zeros(self.nout, dtype=torch.float32)
 
         if gt is not None:
             batch['gt'] = gt
