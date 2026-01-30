@@ -114,10 +114,11 @@ if __name__ == '__main__':
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
 
     for i in tqdm.tqdm(range(0, length, args.batch_size)):
-
+        print('Checkpoint0')
         sample = trainTerms.query(f'(id >= {i}) & (id < {i + args.batch_size})')
         batch_len = min(args.batch_size, length - i)
-
+        print('Checkpoint1')
+        
         for G in ontologies:
             mapper = cudf.Series(get_funcs_mapper(G))
             sample['term_id'] = sample['term'].map(mapper)
@@ -131,10 +132,10 @@ if __name__ == '__main__':
             )
             # mat.scatter_add((sample_ont['id'].values, sample_ont['term_id'].values), 1)
             mat = cp.clip(mat, 0, 1)
-            print('Checkpoint0')
+
             for _ in range(args.n_props):
                 propagate(mat, G)
-            print('Checkpoint1')
+
             for j in range(0, mat.shape[0], args.batch_inner):
                 row, col = cp.nonzero(mat[j: j + args.batch_inner])
 
