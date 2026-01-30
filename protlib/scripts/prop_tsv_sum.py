@@ -94,7 +94,6 @@ if __name__ == '__main__':
             mapper = cudf.Series(get_funcs_mapper(G))
             sample['term_id'] = sample['term'].map(mapper)
             sample_ont = sample.dropna().astype({'term_id': cp.int32})
-
             sample_ont['id'] = sample_ont['id'] - i
 
             mat = cp.zeros((batch_len, G.idxs), dtype=cp.float32)

@@ -131,10 +131,10 @@ if __name__ == '__main__':
             )
             # mat.scatter_add((sample_ont['id'].values, sample_ont['term_id'].values), 1)
             mat = cp.clip(mat, 0, 1)
-
+            print('Checkpoint0')
             for _ in range(args.n_props):
                 propagate(mat, G)
-
+            print('Checkpoint1')
             for j in range(0, mat.shape[0], args.batch_inner):
                 row, col = cp.nonzero(mat[j: j + args.batch_inner])
 
