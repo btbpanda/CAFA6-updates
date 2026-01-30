@@ -118,7 +118,7 @@ if __name__ == '__main__':
         sample = trainTerms.query(f'(id >= {i}) & (id < {i + args.batch_size})')
         batch_len = min(args.batch_size, length - i)
         print('Checkpoint1')
-        
+
         for G in ontologies:
             mapper = cudf.Series(get_funcs_mapper(G))
             sample['term_id'] = sample['term'].map(mapper)

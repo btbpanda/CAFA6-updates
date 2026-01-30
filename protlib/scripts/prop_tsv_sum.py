@@ -59,7 +59,7 @@ if __name__ == '__main__':
         int k;
 
         for (k = 0; k < l; k++) {
-            arr[i_ * lx + col] = arr[i_ * lx + col] + (int)(arr[i_ * lx + j_[k]]) > 0);
+            arr[i_ * lx + col] = arr[i_ * lx + col] + (int)(arr[i_ * lx + j_[k]] > 0);
         }
 
         """,
