@@ -5,6 +5,8 @@ pytorch-env: /usr/bin/python3
 # artifacts paths
 # data_path: /kaggle/input/cafa-6-protein-function-prediction # path to input data
 data_path: /Users/btbpanda/data/cafa6_data # path to input data
+embed_path: /Users/btbpanda/data/cafa6_embeds
+models_path: /Users/btbpanda/data/cafa6_models
 
 
 

@@ -17,5 +17,7 @@ python ./data_scripts/build_evidence_features.py
 python ./data_scripts/uniprot_prop_and_sparse.py
 # propagate evidence and types features
 python ./data_scripts/uniprot_codes_prop.py
-
+# store features in stacker format
+python ./data_scripts/stacker_format_feats.py
+# build SVD cross embedding
 

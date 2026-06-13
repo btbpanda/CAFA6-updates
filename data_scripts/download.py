@@ -1,5 +1,4 @@
 """This script is the starting point, it downloads all data and stores into the folder specified in global config
-
 """
 import subprocess
 import yaml
