@@ -1,5 +1,4 @@
 """This is parser of uniprot to parquet. Select only proteins from any of CAFA 5 / CAFA 6
-
 """
 import argparse
 import os

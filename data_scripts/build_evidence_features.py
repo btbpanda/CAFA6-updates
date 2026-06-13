@@ -46,9 +46,9 @@ if __name__ == '__main__':
     uniprot_path = data_path / 'uniprot'
     graph_path = data_path / 'cafa-6-protein-function-prediction/Train/go-basic.obo'
 
-    evidence_path = data_path / 'evidence'
+    evidence_path = data_path / 'cafa6-uniprot-codes/raw/evidence'
     evidence_path.mkdir(parents=True, exist_ok=True)
-    type_path = data_path / 'type'
+    type_path = data_path / 'cafa6-uniprot-codes/raw/type'
     type_path.mkdir(parents=True, exist_ok=True)
 
     # -----------------------------------
