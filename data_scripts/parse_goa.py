@@ -1,3 +1,5 @@
+"""Build features and labels based on GOA labels
+"""
 import sys
 from pathlib import Path
 

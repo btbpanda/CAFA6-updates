@@ -9,4 +9,4 @@ conda activate $1/rapids-env
 which python
 pip uninstall cupy numba -y # I reinstall default rapids cupy and numba via pypi due to the problems of my environment
 # It is not actually needed in general case
-pip install tqdm cupy-cuda112==10.6 numba==0.56.4 py-boost==0.4.3 
+pip install tqdm cupy-cuda112==10.6 numba==0.56.4 py-boost==0.5.1 polars Bio s3fs

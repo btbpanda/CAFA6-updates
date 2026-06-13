@@ -1,3 +1,7 @@
+"""Build features based on the evidence codes of term and type of relation with term
+
+"""
+
 import sys
 from pathlib import Path
 
