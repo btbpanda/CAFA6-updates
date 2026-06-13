@@ -1,5 +1,6 @@
 # solution artifacts
 embeds/
+data/
 helpers/
 /models/
 *-env/
