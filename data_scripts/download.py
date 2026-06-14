@@ -21,7 +21,7 @@ if __name__ == '__main__':
         unzip {data_path / 'cafa-6-protein-function-prediction.zip'} -d {data_path / 'cafa-6-protein-function-prediction'}
         """,
 
-        # read actual competition data
+        # read cafa 5 competition data
         f"""rm -rf {data_path / 'cafa-5-protein-function-prediction'}
         mkdir {data_path / 'cafa-5-protein-function-prediction'}
         kaggle competitions download -c cafa-5-protein-function-prediction -p {data_path}
