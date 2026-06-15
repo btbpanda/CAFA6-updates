@@ -1,0 +1,62 @@
+
+train_data: cafa6 # options cafa6/cafa5
+
+train_params:
+  n_ep: 20
+  store_swa: 10
+  use_swa: 3
+  p_goa: 0.5
+  p_gt: 0.0
+  num_workers: 8
+  batch_size: 32
+  test_batch_size: 512
+  eval_frequency: 10
+  clip_grad: 0.1
+  lr: 0.001
+  weight_decay: 0.0001
+
+  cond_rate: 0.05
+  
+  swa_start: 5
+  swa_lr: 0.0005  # было 0.0005
+  swa_mode: 'cyclic'  # 'constant', 'cyclic' (было), or 'cosine'
+
+  #loss_type: 'hierarchical'  # 'bce', 'weighted_bce', 'focal', 'hierarchical'
+  #pos_weight: 3.0
+  #neg_weight_mode: 'combined'  # 'ia_based', 'depth_based', 'freq_based', 'combined'
+  #neg_weight_min: 0.1  # min weight for rare/deep terms (dirty negatives)
+  #neg_weight_max: 1.0  # max weight for common/shallow terms
+
+  # For hierarchical loss
+  #hierarchy_weight: 0.1
+
+  hidden_size: 16
+  n_layers: 8
+  embed_size: 8
+
+models:
+  - ./models_228/lin_13500_cond_v2
+  - ./models_228/pb_4500_cond_v2
+  - ./models_228/lin_13500_raw_v2
+  - ./models_228/pb_4500_raw_v2
+  - ./models_228/nn_cafa6_t5esm2S1280_cafa6-sparse-labels13500_cond
+  - ./models_228/nn_cafa6_t5esm2S1280_cafa6-sparse-labels13500_raw
+  - ./models_228/lin_cafa6_svd512bpsvd512cc_cafa6-sparse-labels_cond_v3
+  - ./models_228/lin_cafa6_svd512bpsvd512cc_cafa6-sparse-labels_raw_v3
+  - ./models_228/pb_cafa6_svd512bpsvd512cc_cafa6-sparse-labels_raw_v3
+  - ./models_228/pb_cafa6_svd512bpsvd512cc_cafa6-sparse-labels_cond_v3
+  - ./models_228/pb_cafa6_t5tfidf_cafa6-sparse-labels4500_raw_v2
+
+tta:
+  cfg0:
+    - ./models_228/lin_13500_cond_v2
+    - ./models_228/pb_4500_cond_v2
+    - ./models_228/lin_13500_raw_v2
+    - ./models_228/pb_4500_raw_v2
+    - ./models_228/nn_cafa6_t5esm2S1280_cafa6-sparse-labels13500_cond
+    - ./models_228/nn_cafa6_t5esm2S1280_cafa6-sparse-labels13500_raw
+    - ./models_228/lin_cafa6_svd512bpsvd512cc_cafa6-sparse-labels_cond_v3
+    - ./models_228/lin_cafa6_svd512bpsvd512cc_cafa6-sparse-labels_raw_v3
+    - ./models_228/pb_cafa6_svd512bpsvd512cc_cafa6-sparse-labels_raw_v3
+    - ./models_228/pb_cafa6_svd512bpsvd512cc_cafa6-sparse-labels_cond_v3
+    - ./models_228/pb_cafa6_t5tfidf_cafa6-sparse-labels4500_raw_v2
