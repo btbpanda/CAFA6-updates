@@ -73,6 +73,14 @@ PB_CONFIGS = [
     'pb_cafa6_svd512bpsvd512mf_cafa6-sparse-labels_cond.yaml',
     'pb_cafa6_svd512mfsvd512cc_cafa6-sparse-labels_cond.yaml',
     'pb_cafa6_svd512bpsvd512cc_cafa6-sparse-labels_cond.yaml',
+
+    # tasks based on T5+tfidf
+    'pb_cafa5_t5tfidf_uniprot-sparse-labels4500_raw.yaml',
+]
+
+NN_CONFIGS = [
+    'nn_cafa6_t5esm2S1280_cafa6-sparse-labels13500_raw.yaml',
+    'nn_cafa6_t5esm2S1280_cafa6-sparse-labels13500_cond.yaml'
 ]
 
 
@@ -158,6 +166,12 @@ if __name__ == '__main__':
     task_template = f'{RAPIDS_ENV} ./protlib/scripts/train_pb_c6.py ' + params_row + ' --fold-id {f} --config {c}'
     TASKS.extend(
         task_template.format(f=f, c=configs_path / c) for f, c in product(range(5), PB_CONFIGS)
+    )
+
+    # nn models
+    nn_template = f'{RAPIDS_ENV} ./protlib/nn_solution/train_models.py ' + params_row + ' --fold-id {f} --config {c}'
+    TASKS.extend(
+        task_template.format(f=f, c=configs_path / c) for f, c in product(range(5), NN_CONFIGS)
     )
     # -----------------------------------
     # Get a rest for a few days ..
