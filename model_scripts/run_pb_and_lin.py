@@ -75,7 +75,7 @@ PB_CONFIGS = [
     'pb_cafa6_svd512bpsvd512cc_cafa6-sparse-labels_cond.yaml',
 
     # tasks based on T5+tfidf
-    'pb_cafa5_t5tfidf_uniprot-sparse-labels4500_raw.yaml',
+    'pb_cafa6_t5tfidf_uniprot-sparse-labels4500_raw.yaml',
 ]
 
 NN_CONFIGS = [

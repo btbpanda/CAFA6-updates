@@ -1,0 +1,63 @@
+bp: 10000
+cc: 1500
+conditional: false
+embeds:
+- t5
+- esm2S1280
+mf: 2000
+name: nn_cafa6_t5esm2S1280_cafa6-sparse-labels13500_raw
+old_train_labels: uniprot-old-sparse-labels
+tax_list:
+- 9606
+- 3702
+- 10090
+- 7955
+- 7227
+- 10116
+- 559292
+- 6239
+- 284812
+- 83333
+- 83332
+- 44689
+- 237561
+- 39947
+- 9031
+- 36329
+- 9913
+- 227321
+- 8355
+- 9823
+- 224308
+- 330879
+- 4577
+- 170187
+- 9615
+- 99287
+- 85962
+- 243232
+- 287
+- 235443
+- 8364
+train_data: cafa6
+train_labels: cafa6-sparse-labels
+train_params:
+  n_folds: 5
+  epochs: 30
+  batch_size: 128
+  learning_rate: 0.001
+  weight_decay: 0.0003
+  swa_lr: 0.0003
+  swa_start_epoch: 3
+  early_stopping_patience: 5
+  hidden_dims:
+  - 2048
+  - 1024
+  - 512
+  - 256
+  dropout: 0.3
+  use_dropout: true
+  random_seed: 42
+  num_workers: 4
+valid_data: cafa6
+
