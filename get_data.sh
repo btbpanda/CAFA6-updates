@@ -44,13 +44,15 @@ python ./articles/article_download.py \
     --output-abstracts "./test_final_abstracts.csv" \
     --email "admin@university.edu"
 
+mkdir -p ./processed_abstracts
+mkdir -p ./embeds/articlestfidf
 python ./articles/article_prep.py \
     --train-abstracts train_final_abstracts.csv \
     --old-train-abstracts old_train_final_abstracts.csv \
     --test-abstracts test_final_abstracts.csv \
     --test-protein-ids test_uniprot_ids.txt \
-    --train-seq ../helpers/fasta/train_seq.feather \
-    --old-train-seq ../helpers/fasta/old_train_seq.feather \
-    --test-seq ../helpers/fasta/test_seq.feather \
-    --output-dir ../processed_abstracts \
-    --embeds-dir ../embeds/articlestfidf
+    --train-seq ./helpers/fasta/train_seq.feather \
+    --old-train-seq ./helpers/fasta/old_train_seq.feather \
+    --test-seq ./helpers/fasta/test_seq.feather \
+    --output-dir ./processed_abstracts \
+    --embeds-dir ./embeds/articlestfidf
