@@ -169,7 +169,7 @@ if __name__ == '__main__':
     )
 
     # nn models
-    nn_template = f'{RAPIDS_ENV} ./protlib/nn_solution/train_models.py ' + params_row + ' --fold-id {f} --config {c}'
+    nn_template = f'{RAPIDS_ENV} ./protlib/scripts/train_nn.py ' + params_row + ' --fold-id {f} --config {c}'
     TASKS.extend(
         task_template.format(f=f, c=configs_path / c) for f, c in product(range(5), NN_CONFIGS)
     )
