@@ -52,4 +52,4 @@ python ./articles/article_prep.py \
     --old-train-seq ./helpers/fasta/old_train_seq.feather \
     --test-seq ./helpers/fasta/test_seq.feather \
     --output-dir ./processed_abstracts \
-    --embeds-dir ./embeds/articlestfidf
+    --embeds-dir ./articlestfidf

@@ -277,7 +277,7 @@ def create_embeddings(seq_path, protein_to_texts, tfidf, max_features, entry_id_
     return np.vstack(embeddings), len(seq_df)
 
 
-def generate_final_embeddings(data_path, args, tfidf, train_df, old_train_df, test_df):
+def generate_final_embeddings(data_path, embed_path, args, tfidf, train_df, old_train_df, test_df):
     """Generates and saves final embedding files."""
     print("\n[4/4] Generating TF-IDF embeddings aligned with sequences...")
 
@@ -292,6 +292,7 @@ def generate_final_embeddings(data_path, args, tfidf, train_df, old_train_df, te
         return mapping
 
     data_path = Path(data_path)
+    embed_path = Path(embed_path)
 
     print("  Creating protein-to-text mappings...")
     train_map = map_protein_to_texts(train_df)
@@ -306,7 +307,7 @@ def generate_final_embeddings(data_path, args, tfidf, train_df, old_train_df, te
     train_embeds, train_count = create_embeddings(
         data_path / args.train_seq, train_map, tfidf, args.tfidf_max_features
     )
-    train_path = data_path / args.embeds_dir / "train_embeds.npy"
+    train_path = embed_path / args.embeds_dir / "train_embeds.npy"
     np.save(train_path, train_embeds)
     print(f"  Train embeddings shape: {train_embeds.shape} -> Saved to {train_path}")
 
@@ -314,7 +315,7 @@ def generate_final_embeddings(data_path, args, tfidf, train_df, old_train_df, te
     old_train_embeds, old_train_count = create_embeddings(
         data_path / args.old_train_seq, old_train_map, tfidf, args.tfidf_max_features
     )
-    old_train_path = data_path / args.embeds_dir / "old_train_embeds.npy"
+    old_train_path = embed_path / args.embeds_dir / "old_train_embeds.npy"
     np.save(old_train_path, old_train_embeds)
     print(f"  Old train embeddings shape: {old_train_embeds.shape} -> Saved to {old_train_path}")
 
@@ -322,7 +323,7 @@ def generate_final_embeddings(data_path, args, tfidf, train_df, old_train_df, te
     test_embeds, test_count = create_embeddings(
         data_path / args.test_seq, test_map, tfidf, args.tfidf_max_features
     )
-    test_path = data_path / args.embeds_dir / "test_embeds.npy"
+    test_path = embed_path / args.embeds_dir / "test_embeds.npy"
     np.save(test_path, test_embeds)
     print(f"  Test embeddings shape: {test_embeds.shape} -> Saved to {test_path}")
 
@@ -349,8 +350,10 @@ def main():
         Path('./config.yaml').read_text()
     )
     data_path = Path(config['data_path']).resolve()
+    embed_path = Path(config['embed_path']).resolve()
+
     output_dir = data_path / args.output_dir
-    embeds_dir = data_path / args.embeds_dir
+    embeds_dir = embed_path / args.embeds_dir
 
     # Create output directories
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -378,7 +381,9 @@ def main():
     tfidf = train_tfidf(train_df, old_train_df, test_df, args, tfidf_model_path, tfidf_vocab_path)
 
     # 5. Generate Embeddings
-    train_path, old_train_path, test_path = generate_final_embeddings(data_path, args, tfidf, train_df, old_train_df, test_df)
+    train_path, old_train_path, test_path = generate_final_embeddings(
+        data_path, embed_path, args, tfidf, train_df, old_train_df, test_df
+    )
 
     # Final Report
     print("\n" + "=" * 70)
