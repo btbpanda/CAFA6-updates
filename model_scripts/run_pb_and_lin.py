@@ -1,4 +1,4 @@
-"""This is py-boost and lin reg model runner. Script only manages training jobs, not implement train logic.
+"""This is py-boost, lin reg, and MLP model runner. Script only manages training jobs, not implement train logic.
 For algorithms pls refer prolib module
 Finally, this script performs aggregation across folds models, collect single OOF and do single test prediction as avg
 This is the longest running part

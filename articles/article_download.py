@@ -2,6 +2,8 @@ import pandas as pd
 import requests
 import time
 import argparse
+import yaml
+from pathlib import Path
 from Bio import Entrez
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -23,10 +25,6 @@ def parse_args():
                         help='File to save the Protein -> PMID mapping.')
     parser.add_argument('--output-abstracts', type=str, default='./old_train_final_abstracts.csv',
                         help='File to save final data with abstracts.')
-
-    # NCBI/UniProt Settings
-    parser.add_argument('--email', type=str, default='my-mail@gmai.com',
-                        help='Email for NCBI registration (required for API usage).')
     
     # Batch processing parameters
     parser.add_argument('--uniprot-batch', type=int, default=50,
@@ -152,19 +150,24 @@ def get_abstracts_from_pubmed(pmid_list, user_email, batch_size):
 
 def main():
     args = parse_args()
+    config = yaml.safe_load(
+        Path('./config.yaml').read_text()
+    )
+    email = config['email']
+    data_path = Path(config['data_path']).resolve()
 
     # Read input data
     try:
-        train = pd.read_feather(args.seq_file)
+        train = pd.read_feather(data_path / args.seq_file)
         proteins = train['EntryID'].values.tolist()
     except FileNotFoundError:
-        print(f"[!] Error: File '{args.seq_file}' not found.")
+        print(f"[!] Error: File '{data_path / args.seq_file}' not found.")
         return
     except KeyError:
-        print(f"[!] Error: Column 'EntryID' missing in file '{args.seq_file}'.")
+        print(f"[!] Error: Column 'EntryID' missing in file '{data_path / args.seq_file}'.")
         return
 
-    with open(args.ids_file, 'wt') as f:
+    with open(data_path / args.ids_file, 'wt') as f:
         f.write('\n'.join(proteins))
 
     # 2. Get PMIDs from UniProt
@@ -174,12 +177,12 @@ def main():
         print("No PMIDs found. Check the protein list or connection.")
         return
 
-    df_links.to_csv(args.output_mapping, index=False)
-    print(f"[+] Mapping saved to {args.output_mapping}")
+    df_links.to_csv(data_path / args.output_mapping, index=False)
+    print(f"[+] Mapping saved to {data_path / args.output_mapping}")
     
     # 3. Download texts from PubMed
     all_pmids = df_links['PMID'].tolist()
-    df_abstracts = get_abstracts_from_pubmed(all_pmids, args.email, args.pubmed_batch)
+    df_abstracts = get_abstracts_from_pubmed(all_pmids, email, args.pubmed_batch)
     
     if df_abstracts.empty:
         print("Failed to download abstracts.")
@@ -188,8 +191,8 @@ def main():
     # 4. Merge data
     final_df = pd.merge(df_links, df_abstracts, on='PMID', how='left')
     
-    final_df.to_csv(args.output_abstracts, index=False)
-    print(f"\n[SUCCESS] Done! Results saved to {args.output_abstracts}")
+    final_df.to_csv(data_path / args.output_abstracts, index=False)
+    print(f"\n[SUCCESS] Done! Results saved to {data_path / args.output_abstracts}")
 
 if __name__ == "__main__":
     main()

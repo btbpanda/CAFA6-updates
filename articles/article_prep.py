@@ -5,6 +5,7 @@ import polars as pl
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 import pickle
+import yaml
 from pathlib import Path
 from collections import Counter
 from tqdm import tqdm
@@ -38,7 +39,7 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def load_data(args):
+def load_data(data_path, args, ):
     """Loads all input datasets using Polars."""
     print("\n[1/4] Loading data...")
 
@@ -49,17 +50,19 @@ def load_data(args):
         "Abstract": pl.Utf8
     }
 
+    data_path = Path(data_path)
+
     print("  Loading train abstracts...")
-    train_df = pl.read_csv(args.train_abstracts, dtypes=dtypes)
+    train_df = pl.read_csv(data_path / args.train_abstracts, dtypes=dtypes)
 
     print("  Loading old train abstracts...")
-    old_train_df = pl.read_csv(args.old_train_abstracts, dtypes=dtypes)
+    old_train_df = pl.read_csv(data_path / args.old_train_abstracts, dtypes=dtypes)
 
     print("  Loading test abstracts...")
-    test_df = pl.read_csv(args.test_abstracts, dtypes=dtypes)
+    test_df = pl.read_csv(data_path / args.test_abstracts, dtypes=dtypes)
 
     print("  Loading test protein IDs...")
-    with open(args.test_protein_ids, 'r') as f:
+    with open(data_path / args.test_protein_ids, 'r') as f:
         test_protein_ids = set(line.strip() for line in f)
 
     print(f"\nLoading Statistics:")
@@ -274,7 +277,7 @@ def create_embeddings(seq_path, protein_to_texts, tfidf, max_features, entry_id_
     return np.vstack(embeddings), len(seq_df)
 
 
-def generate_final_embeddings(args, tfidf, train_df, old_train_df, test_df):
+def generate_final_embeddings(data_path, args, tfidf, train_df, old_train_df, test_df):
     """Generates and saves final embedding files."""
     print("\n[4/4] Generating TF-IDF embeddings aligned with sequences...")
 
@@ -288,6 +291,8 @@ def generate_final_embeddings(args, tfidf, train_df, old_train_df, test_df):
             mapping[pid].append(text)
         return mapping
 
+    data_path = Path(data_path)
+
     print("  Creating protein-to-text mappings...")
     train_map = map_protein_to_texts(train_df)
     old_train_map = map_protein_to_texts(old_train_df)
@@ -299,25 +304,25 @@ def generate_final_embeddings(args, tfidf, train_df, old_train_df, test_df):
 
     # Train
     train_embeds, train_count = create_embeddings(
-        args.train_seq, train_map, tfidf, args.tfidf_max_features
+        data_path / args.train_seq, train_map, tfidf, args.tfidf_max_features
     )
-    train_path = Path(args.embeds_dir) / "train_embeds.npy"
+    train_path = data_path / args.embeds_dir / "train_embeds.npy"
     np.save(train_path, train_embeds)
     print(f"  Train embeddings shape: {train_embeds.shape} -> Saved to {train_path}")
 
     # Old Train
     old_train_embeds, old_train_count = create_embeddings(
-        args.old_train_seq, old_train_map, tfidf, args.tfidf_max_features
+        data_path / args.old_train_seq, old_train_map, tfidf, args.tfidf_max_features
     )
-    old_train_path = Path(args.embeds_dir) / "old_train_embeds.npy"
+    old_train_path = data_path / args.embeds_dir / "old_train_embeds.npy"
     np.save(old_train_path, old_train_embeds)
     print(f"  Old train embeddings shape: {old_train_embeds.shape} -> Saved to {old_train_path}")
 
     # Test
     test_embeds, test_count = create_embeddings(
-        args.test_seq, test_map, tfidf, args.tfidf_max_features
+        data_path / args.test_seq, test_map, tfidf, args.tfidf_max_features
     )
-    test_path = Path(args.embeds_dir) / "test_embeds.npy"
+    test_path = data_path / args.embeds_dir / "test_embeds.npy"
     np.save(test_path, test_embeds)
     print(f"  Test embeddings shape: {test_embeds.shape} -> Saved to {test_path}")
 
@@ -340,21 +345,28 @@ def get_file_size(path):
 def main():
     args = parse_arguments()
 
+    config = yaml.safe_load(
+        Path('./config.yaml').read_text()
+    )
+    data_path = Path(config['data_path']).resolve()
+    output_dir = data_path / args.output_dir
+    embeds_dir = data_path / args.embeds_dir
+
     # Create output directories
-    Path(args.output_dir).mkdir(parents=True, exist_ok=True)
-    Path(args.embeds_dir).mkdir(parents=True, exist_ok=True)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    embeds_dir.mkdir(parents=True, exist_ok=True)
 
     # Define output paths
-    stats_path = Path(args.output_dir) / "abstract_statistics.txt"
-    tfidf_model_path = Path(args.output_dir) / "tfidf_model.pkl"
-    tfidf_vocab_path = Path(args.output_dir) / "tfidf_vocab.pkl"
+    stats_path = output_dir / "abstract_statistics.txt"
+    tfidf_model_path = output_dir / "tfidf_model.pkl"
+    tfidf_vocab_path = output_dir / "tfidf_vocab.pkl"
 
     print("=" * 70)
     print("Processing Article Abstracts")
     print("=" * 70)
 
     # 1. Load Data
-    train_df, old_train_df, test_df, test_protein_ids = load_data(args)
+    train_df, old_train_df, test_df, test_protein_ids = load_data(data_path, args)
 
     # 2. Preprocess
     train_df, old_train_df, test_df = preprocess_data(train_df, old_train_df, test_df)
@@ -366,7 +378,7 @@ def main():
     tfidf = train_tfidf(train_df, old_train_df, test_df, args, tfidf_model_path, tfidf_vocab_path)
 
     # 5. Generate Embeddings
-    train_path, old_train_path, test_path = generate_final_embeddings(args, tfidf, train_df, old_train_df, test_df)
+    train_path, old_train_path, test_path = generate_final_embeddings(data_path, args, tfidf, train_df, old_train_df, test_df)
 
     # Final Report
     print("\n" + "=" * 70)
