@@ -6,6 +6,7 @@ If some jobs are failed, you can re-run the script from start and it skips compl
 """
 import argparse
 import subprocess
+import sys
 from pathlib import Path
 
 import yaml
@@ -130,7 +131,7 @@ if __name__ == '__main__':
 
     embed_path = Path(config['embed_path']).resolve()
     models_path = Path(config['models_path']).resolve()
-    RAPIDS_ENV = config['rapids-env']
+    RAPIDS_ENV = sys.executable
 
     # -----------------------------------
     # COLLECT TASKS LIST

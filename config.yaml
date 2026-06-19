@@ -1,7 +1,7 @@
 base_path: ./ # working dir
 # environments
-rapids-env: /usr/bin/python3
-pytorch-env: /usr/bin/python3
+#rapids-env: /usr/bin/python3
+#pytorch-env: /usr/bin/python3
 email: admin@university.edu # Email for NCBI registration (required for API usage).
 # artifacts paths
 # data_path: /kaggle/input/cafa-6-protein-function-prediction # path to input data

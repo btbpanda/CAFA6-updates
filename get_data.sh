@@ -41,8 +41,6 @@ python ./articles/article_download.py \
     --output-mapping "./test_protein_to_pmid.csv" \
     --output-abstracts "./test_final_abstracts.csv"
 
-# mkdir -p ./processed_abstracts
-# mkdir -p ./embeds/articlestfidf
 python ./articles/article_prep.py \
     --train-abstracts train_final_abstracts.csv \
     --old-train-abstracts old_train_final_abstracts.csv \

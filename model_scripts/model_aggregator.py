@@ -1,5 +1,4 @@
 import polars as pl
-import os
 import shutil
 from pathlib import Path
 import yaml
@@ -118,13 +117,14 @@ def aggregate_test_folders(models_list, test_output_dir):
                 
                 aggregated.write_parquet(test_output_dir / file_name)
 
-def aggregate_predictions(model_groups):
+def aggregate_predictions(models_path, model_groups):
     """Агрегирует предсказания моделей"""
     for (prefix, suffix), models_list in model_groups.items():
         print(f"Агрегация для {prefix}_{suffix}...")
         
         # Создаем папку для агрегированных результатов
-        output_folder = Path(f"{prefix}_{suffix}")
+        models_path = Path(models_path)
+        output_folder = models_path / f"{prefix}_{suffix}"
         output_folder.mkdir(exist_ok=True)
         
         # Создаем подпапки
@@ -156,6 +156,12 @@ def aggregate_predictions(model_groups):
         print(f"  Агрегированы тестовые файлы для {prefix}_{suffix}")
 
 def main():
+
+    config = yaml.safe_load(
+        Path('./config.yaml').read_text()
+    )
+    models_path = Path(config['models_path']).resolve()
+
     # Группируем модели по префиксам и суффиксам
     model_groups = {}
     
@@ -165,7 +171,7 @@ def main():
             key = (prefix, suffix)
             if key not in model_groups:
                 model_groups[key] = []
-            model_groups[key].append(model)
+            model_groups[key].append(models_path / model)
     
     # Выводим группы для проверки
     print("Группы моделей:")
@@ -173,7 +179,7 @@ def main():
         print(f"{prefix}_{suffix}: {len(models_list)} моделей")
     
     # Агрегируем предсказания
-    aggregate_predictions(model_groups)
+    aggregate_predictions(models_path, model_groups)
     print("\nАгрегация завершена!")
 
 if __name__ == "__main__":

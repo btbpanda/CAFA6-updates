@@ -1,27 +1,30 @@
 import argparse
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = '3,4'
 import re
 
 import numpy as np
-import torch
 import tqdm
-import yaml
-from Bio import SeqIO
-from transformers import T5Tokenizer, T5EncoderModel, T5ForConditionalGeneration
 import pyarrow.feather as feather
 
+from pathlib import Path
 
-device = torch.device(f'cuda' if torch.cuda.is_available() else 'cpu')
-device_ids=[0,1]
+parser = argparse.ArgumentParser()
+parser.add_argument('-f', '--file', type=str)
+parser.add_argument('-t', '--fasta', type=str)
+parser.add_argument('-e', '--embed-path', type=str)
+parser.add_argument('-d', '--device', type=str)
+
+
 
 def get_embeddings(model, tokenizer, seq):
     sequence_examples = [" ".join(list(re.sub(r"[UZOB]", "X", seq)))]
 
-    ids = tokenizer.batch_encode_plus(sequence_examples, return_tensors="pt", padding=True, truncation=True, max_length=1000)
+    ids = tokenizer.batch_encode_plus(
+        sequence_examples, return_tensors="pt", padding=True, truncation=True, max_length=1000
+    )
 
-    input_ids = torch.tensor(ids['input_ids']).to(device)
-    attention_mask = torch.tensor(ids['attention_mask']).to(device)
+    input_ids = torch.tensor(ids['input_ids']).to(DEVICE)
+    attention_mask = torch.tensor(ids['attention_mask']).to(DEVICE)
 
     # generate embeddings
     with torch.no_grad():
@@ -38,10 +41,20 @@ def get_embeddings(model, tokenizer, seq):
 
 
 if __name__ == '__main__':
-    config = {
-        'base_path': './',
-        'embeds_path': './embeds'
-    }    
+
+    args = parser.parse_args()
+
+    os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+    os.environ["CUDA_VISIBLE_DEVICES"] = args.device
+
+    import torch
+    from transformers import T5Tokenizer, T5EncoderModel, T5ForConditionalGeneration
+
+    DEVICE = torch.device(f'cuda' if torch.cuda.is_available() else 'cpu')
+    DEVICE_IDS = [0, ]
+
+    fasta_path = Path(args.fasta)
+    embed_path = Path(args.embed_path)
 
     tokenizer = T5Tokenizer.from_pretrained('Rostlab/prot_t5_xl_half_uniref50-enc', do_lower_case=False)
     model = T5EncoderModel.from_pretrained(
@@ -52,11 +65,10 @@ if __name__ == '__main__':
     )
     model.eval()
 
-    kaggle_dataset = config['base_path']  # sys.argv[1]
-    output_path = os.path.join(config['base_path'], config['embeds_path'], 't5')  # sys.argv[2]
-    os.makedirs(output_path, exist_ok=True)
+    output_path = embed_path / 't5'
+    output_path.mkdir(parents=True, exist_ok=True)
 
-    fn = os.path.join(kaggle_dataset, 'helpers/fasta/old_train_seq.feather')
+    fn = fasta_path / (args.file + '_seq.feather')
     read_df = feather.read_feather(fn)
     num_sequences = read_df.shape[0]
 
@@ -67,5 +79,5 @@ if __name__ == '__main__':
         ids.append(seq_id)
         embeds[i] = get_embeddings(model, tokenizer, str(seq)).detach().cpu().numpy()
 
-    np.save(os.path.join(output_path, 'old_train_embeds.npy'), embeds)
-    np.save(os.path.join(output_path, 'old_train_ids.npy'), np.array(ids))
+    np.save(output_path / (args.file + '_embed.npy'), embeds)
+    np.save(output_path / (args.file + '_ids.npy'), np.array(ids))
