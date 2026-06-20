@@ -33,6 +33,15 @@ It is possible to run with lower hardware, however it takes a lot of time. At le
 
 To install default python dependencies, please execute `./setup-env.sh`
 
+Before running the code you need to change `config.yaml` according to you environment. What should be changed:
+* Number of available GPUs
+* Path to store the artifact 
+* Put any valid email in order to be able to download articles data via API 
+
+Also, the code uses kaggle API to download competition data and previous CAFA 5 competition 
+which is also used to train the models. After `kaggle` library is installed you need to set it up to be able to use 
+API via existing account. For the details pls refer the page [https://www.kaggle.com/discussions/getting-started/524433](https://www.kaggle.com/discussions/getting-started/524433) 
+
 # NEXT STEPS
 
 To reproduce the solution please run `./run.sh`.
