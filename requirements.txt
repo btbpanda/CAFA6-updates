@@ -1,2 +1,16 @@
 pyyaml
 kaggle
+tqdm
+pyarrow
+py-boost==0.5.1
+polars
+Bio
+s3fs
+fair-esm
+obonet
+pyvis
+transformers
+torchmetrics
+torchsummary
+sentencepiece
+psutil

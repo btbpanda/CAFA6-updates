@@ -14,8 +14,3 @@ devices:
   - 5
   - 6
   - 7
-
-stacker_seeds:
-  - 42
-  - 53
-

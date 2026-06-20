@@ -55,17 +55,17 @@ if __name__ == '__main__':
         --elabels-path {stacker_feats_path} \
         --model-path stacking_nn_cross_pbtfidf_f_{{seed}} \
         --test-mode 228 \
-        --output ./prediction_nn_cross_pbtfidf_f_{{seed}} \
+        --output prediction_nn_cross_pbtfidf_f_{{seed}} \
         --ontology bp mf cc \
         --devices {DEVICES}
     """
 
     TRAIN_TASKS = [
-        train_template.format(ontology=ont, seed=s) for (ont, s) in product(['bp', 'mf', 'cc'], config['stacker_seeds'])
+        train_template.format(ontology=ont, seed=s) for (ont, s) in product(['bp', 'mf', 'cc'], [42, 53])
     ]
 
     PREDICTION_TASKS = [
-        prediction_template.format(seed=s) for s in config['stacker_seeds']
+        prediction_template.format(seed=s) for s in [42, 53]
     ]
 
     # -----------------------------------
