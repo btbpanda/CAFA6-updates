@@ -4,7 +4,6 @@ Finally, this script performs aggregation across folds models, collect single OO
 This is the longest running part
 If some jobs are failed, you can re-run the script from start and it skips completed jobs
 """
-import argparse
 import subprocess
 import sys
 from pathlib import Path
@@ -18,12 +17,6 @@ from multiprocessing import Queue
 from itertools import product
 from joblib import Parallel, delayed
 
-
-parser = argparse.ArgumentParser()
-
-parser.add_argument(
-    '-d', '--DEVICES',nargs='*', type=str, default=['0', '1', '2', '3', '4', '5', '6', '7']
-)
 
 LIN_CONFIGS = [
     # '/kaggle/working/CAFA6-updates/configs/lin_debug.yaml',  # single config to debug
@@ -120,7 +113,6 @@ def run_task(task, ):
 
 
 if __name__ == '__main__':
-    args = parser.parse_args()
 
     config = yaml.safe_load(
         Path('./config.yaml').read_text()
@@ -132,12 +124,13 @@ if __name__ == '__main__':
     embed_path = Path(config['embed_path']).resolve()
     models_path = Path(config['models_path']).resolve()
     RAPIDS_ENV = sys.executable
+    DEVICES = config['devices']
 
     # -----------------------------------
     # COLLECT TASKS LIST
     # -----------------------------------
-    QUEUE = Queue(maxsize=len(args.devices))
-    for i in args.devices:
+    QUEUE = Queue(maxsize=len(DEVICES))
+    for i in DEVICES:
         QUEUE.put(i)
 
     ENV_PARAMS = {
@@ -177,7 +170,7 @@ if __name__ == '__main__':
     # -----------------------------------
     # Get a rest for a few days ..
     # -----------------------------------
-    with Parallel(n_jobs=len(args.devices), backend="threading") as p:
+    with Parallel(n_jobs=len(DEVICES), backend="threading") as p:
         p(delayed(run_task)(x) for x in tqdm(TASKS))
 
     # -----------------------------------

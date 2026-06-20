@@ -13,6 +13,7 @@ sys.path.append(os.path.abspath(os.path.join(__file__, '../../../')))
 print(sys.executable)
 parser = argparse.ArgumentParser()
 
+parser.add_argument('-m', '--models-path', type=str)
 parser.add_argument('-g', '--graph-path', type=str)
 parser.add_argument('-ia', '--ia-path', type=str)
 parser.add_argument('-t', '--target-path', type=str)
@@ -27,8 +28,20 @@ parser.add_argument('-out', '--output', type=str)
 parser.add_argument('-o', '--ontology', type=str)
 parser.add_argument('-c', '--config', type=str)
 parser.add_argument('-d', '--devices', type=int, nargs='+')
+parser.add_argument('-s', '--seed', type=int, default=42)
 
 ont_dict = {'bp': 0, 'mf': 1, 'cc': 2}
+
+
+def seed_everything(seed=42):
+
+    # NumPy randomness
+    np.random.seed(seed)
+
+    # PyTorch randomness
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)  # Safe to call even if multi-GPU is not used
 
 
 def train_gcn(model, train_dl, val_dl, evaluator, n_ep=20, lr=1e-3, clip_grad=1,
@@ -168,6 +181,8 @@ if __name__ == '__main__':
     from protnn.dataset import *
     from protnn.stacker import *
 
+    seed_everything(args.seed)
+
     with open(args.config, 'r') as f:
         config = yaml.safe_load(f)
 
@@ -177,7 +192,9 @@ if __name__ == '__main__':
     ia_path = args.ia_path
     NOUT = ont_dict[args.ontology]  # ontology to train
 
-    work_dir = os.path.join(args.output, args.ontology)
+    # assume stacker models are stored in models path
+    output = os.path.join(args.models_path, args.output)
+    work_dir = os.path.join(output, args.ontology)
     temp_dir = os.path.join(work_dir, 'temp')
     os.makedirs(temp_dir, exist_ok=True)
 
@@ -254,8 +271,8 @@ if __name__ == '__main__':
     # load model predictions
     train_preds = [
         Prediction(
-            path=[os.path.join(model_path, 'predictions', x) for x in pred_files],
-            graph=G, prot_ids=train['EntryID'], **get_params_from_cfg(model_path)
+            path=[os.path.join(args.models_path, model_path, 'predictions', x) for x in pred_files],
+            graph=G, prot_ids=train['EntryID'], **get_params_from_cfg(os.path.join(args.models_path, model_path))
         ) for model_path in config['models']
     ]
 
@@ -288,8 +305,8 @@ if __name__ == '__main__':
 
     test_preds = [
         Prediction(
-            path=os.path.join(model_path, 'predictions/test', ),
-            graph=G, prot_ids=ids_to_take, **get_params_from_cfg(model_path)
+            path=os.path.join(args.models_path, model_path, 'predictions/test', ),
+            graph=G, prot_ids=ids_to_take, **get_params_from_cfg(os.path.join(args.models_path, model_path))
         ) for model_path in config['models']
     ]
 

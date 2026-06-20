@@ -1,7 +1,6 @@
 """This is DL embeds inference. Script only manages training jobs, not implement train logic.
 For algorithms pls refer embeddings module
 """
-import argparse
 import sys
 import subprocess
 import tqdm
@@ -11,11 +10,6 @@ from pathlib import Path
 from multiprocessing import Queue
 from joblib import Parallel, delayed
 
-parser = argparse.ArgumentParser()
-
-parser.add_argument(
-    '-d', '--DEVICES',nargs='*', type=str, default=['0', '1', '2', '3', '4', '5', '6', '7']
-)
 
 def run_task(task, ):
 
@@ -30,7 +24,6 @@ def run_task(task, ):
 
 
 if __name__ == '__main__':
-    args = parser.parse_args()
 
     config = yaml.safe_load(
         Path('./config.yaml').read_text()
@@ -40,12 +33,13 @@ if __name__ == '__main__':
     fasta_path = data_path / 'helpers/fasta'
     embed_path = Path(config['embed_path']).resolve()
     PYTHON = sys.executable
+    DEVICES = config['devices']
 
     # -----------------------------------
     # COLLECT TASKS LIST
     # -----------------------------------
-    QUEUE = Queue(maxsize=len(args.devices))
-    for i in args.devices:
+    QUEUE = Queue(maxsize=len(DEVICES))
+    for i in DEVICES:
         QUEUE.put(i)
 
     ENV_PARAMS = {
@@ -74,5 +68,5 @@ if __name__ == '__main__':
     # -----------------------------------
     # Get a rest for a few days ..
     # -----------------------------------
-    with Parallel(n_jobs=len(args.devices), backend="threading") as p:
+    with Parallel(n_jobs=len(DEVICES), backend="threading") as p:
         p(delayed(run_task)(x) for x in tqdm.tqdm(TASKS))

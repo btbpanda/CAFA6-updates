@@ -1,6 +1,7 @@
 """Build cross embedding: we build one hot -> SVD embedding on separate ontologies
 The idea is to boost limited knowledge part: to predict BP we can use MF+CC info ...
 """
+import os
 import sys
 from pathlib import Path
 
@@ -10,9 +11,7 @@ import yaml
 import numpy as np
 import polars as pl
 import pandas as pd
-import cupy as cp
-import cuml
-from protlib.metric import obo_parser, Graph
+
 
 FREQ_CO = 5
 
@@ -21,6 +20,14 @@ if __name__ == '__main__':
     config = yaml.safe_load(
         Path('./config.yaml').read_text()
     )
+
+    os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(config['devices'][0]) # args.device
+
+    import cupy as cp
+    import cuml
+    from protlib.metric import obo_parser, Graph
+
     data_path = Path(config['data_path']).resolve()
     cafa6_path = data_path / 'cafa-6-protein-function-prediction'
     graph_path = cafa6_path / 'Train/go-basic.obo'

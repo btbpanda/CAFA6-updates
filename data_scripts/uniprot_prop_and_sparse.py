@@ -2,7 +2,7 @@
 Building sparkse
 """
 
-
+import sys
 import subprocess
 import yaml
 from pathlib import Path
@@ -16,7 +16,8 @@ if __name__ == '__main__':
     uniprot_raw_path = data_path / 'uniprot/raw'
     cafa6_path = data_path / 'cafa-6-protein-function-prediction'
     graph_path = cafa6_path / 'Train/go-basic.obo'
-    RAPIDS_ENV = config['rapids-env']
+    RAPIDS_ENV = sys.executable
+    DEVICE = config['devices'][0]
 
     # -----------------------------------
     # Build CAFA 6 target as propagated
@@ -26,7 +27,7 @@ if __name__ == '__main__':
         --path {cafa6_path / 'Train/train_terms.tsv'} \
         --graph {graph_path} \
         --output {data_path / 'train_terms.tsv'} \
-        --device 0 \
+        --device {DEVICE} \
         --n-props 2 \
         --direction backward \
         --func max \
@@ -51,7 +52,7 @@ if __name__ == '__main__':
             --path {inp} \
             --graph {graph_path} \
             --output {outp} \
-            --device 0 \
+            --device {DEVICE} \
             --n-props 2 \
             --direction {direction} \
             --func max \

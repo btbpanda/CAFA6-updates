@@ -10,9 +10,10 @@ sys.path.append(os.path.abspath(os.path.join(__file__, '../../../')))
 print(sys.executable)
 parser = argparse.ArgumentParser()
 
+parser.add_argument('-m', '--models-path', type=str)
 parser.add_argument('-g', '--graph-path', type=str)
 parser.add_argument('-el', '--elabels-path', type=str)
-parser.add_argument('-m', '--model-path', type=str)
+parser.add_argument('-mp', '--model-path', type=str)
 parser.add_argument('-tm', '--test-mode', type=str, default='226')
 
 parser.add_argument('-out', '--output', type=str)
@@ -125,7 +126,7 @@ if __name__ == '__main__':
         nout = ont_dict[ontology]
         G = ontologies[nout]
 
-        model_path = os.path.join(args.model_path, ontology)
+        model_path = os.path.join(args.models_path, args.model_path, ontology)
 
         # Load config
         with open(os.path.join(model_path, 'config.yaml'), 'r') as f:
@@ -170,7 +171,7 @@ if __name__ == '__main__':
         for k, tta_cfg in enumerate(cfg['tta']):
             print(f'Running TTA config {k}: {tta_cfg}...')
 
-            output_path = os.path.join(args.output, f'pred_tta_{k}.tsv')
+            output_path = os.path.join(args.models_path, args.output, f'pred_tta_{k}.tsv')
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
             model_names = cfg['tta'][tta_cfg]

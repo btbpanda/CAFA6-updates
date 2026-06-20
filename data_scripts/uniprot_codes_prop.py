@@ -1,7 +1,7 @@
 """Propagate extra evidence/type features
 """
 
-
+import sys
 import subprocess
 import yaml
 from pathlib import Path
@@ -19,7 +19,8 @@ if __name__ == '__main__':
 
     cafa6_path = data_path / 'cafa-6-protein-function-prediction'
     graph_path = cafa6_path / 'Train/go-basic.obo'
-    RAPIDS_ENV = config['rapids-env']
+    RAPIDS_ENV = sys.executable
+    DEVICE = config['devices'][0]
 
     # -----------------------------------
     # Build features from auto labels (counts)
@@ -29,7 +30,7 @@ if __name__ == '__main__':
         --path {features_path / 'train_auto.tsv'} \
         --graph {graph_path} \
         --output {uni_codes_path / 'train_auto.tsv'} \
-        --device 0 \
+        --device  {DEVICE} \
         --n-props 2 \
         --batch-size 30000 \
         --batch-inner 5000
@@ -40,7 +41,7 @@ if __name__ == '__main__':
         --path {features_path / 'old_train_auto.tsv'} \
         --graph {graph_path} \
         --output {uni_codes_path / 'old_train_auto.tsv'}  \
-        --device 0 \
+        --device {DEVICE} \
         --n-props 2 \
         --batch-size 30000 \
         --batch-inner 5000
@@ -51,7 +52,7 @@ if __name__ == '__main__':
         --path {features_path / 'test_auto228.tsv'} \
         --graph {graph_path} \
         --output {uni_codes_path / 'test_auto228.tsv'} \
-        --device 0 \
+        --device {DEVICE} \
         --n-props 2 \
         --batch-size 30000 \
         --batch-inner 5000
@@ -73,7 +74,7 @@ if __name__ == '__main__':
             --path {inp} \
             --graph {graph_path} \
             --output {outp} \
-            --device 0 \
+            --device {DEVICE} \
             --n-props 2 \
             --batch-size 30000 \
             --batch-inner 5000
