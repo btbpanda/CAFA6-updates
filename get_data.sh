@@ -1,3 +1,4 @@
+#!/bin/bash
 
 # download contents
 python ./data_scipts/download.py
