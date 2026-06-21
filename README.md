@@ -47,3 +47,5 @@ API via existing account. For the details pls refer the page [https://www.kaggle
 To reproduce the solution please run `./run.sh`.
 
 You can also run data and model steps separately by executing `./get_data.sh` and `./get_models.sh`. 
+
+The result will be stored in folder that is set in `./models_path/submission.tsv`, where `models_path` is the path provided in `config.yaml`
