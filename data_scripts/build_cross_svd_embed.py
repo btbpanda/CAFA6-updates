@@ -12,8 +12,6 @@ import numpy as np
 import polars as pl
 import pandas as pd
 
-print(pl.__version__)
-
 
 FREQ_CO = 5
 
@@ -41,7 +39,7 @@ if __name__ == '__main__':
     for ns, terms_dict in obo_parser(graph_path).items():
         ontologies.append(Graph(ns, terms_dict, None, True))
 
-    train_terms = pd.read_csv(cafa6_path / 'Train/train_terms.tsv', sep='\t')
+    train_terms = pd.read_csv(data_path / 'train_terms.tsv', sep='\t')
     vc = train_terms['term'].value_counts()
 
     for G in ontologies:
@@ -63,10 +61,6 @@ if __name__ == '__main__':
         all_terms = [x['id'] for x in G.terms_list]
         freq = vc[vc.index.isin(all_terms) & (vc >= FREQ_CO)]
         columns = freq.index.tolist()
-
-        print('Reading dataset ', list(
-                helpers_path.glob(f'cafa6-sparse-labels/{G.namespace}/part_*.parquet')
-            ))
 
         target = pl.read_parquet(
             sorted(
