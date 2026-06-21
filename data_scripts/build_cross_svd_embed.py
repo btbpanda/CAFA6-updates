@@ -62,6 +62,10 @@ if __name__ == '__main__':
         freq = vc[vc.index.isin(all_terms) & (vc >= FREQ_CO)]
         columns = freq.index.tolist()
 
+        print('Reading dataset ', list(
+                helpers_path.glob(f'cafa6-sparse-labels/{G.namespace}/part_*.parquet')
+            ))
+
         target = pl.read_parquet(
             list(
                 helpers_path.glob(f'cafa6-sparse-labels/{G.namespace}/part_*.parquet')
