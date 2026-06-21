@@ -106,7 +106,7 @@ if __name__ == '__main__':
     dump_path = data_path / 'helpers/fasta'
     dump_path.mkdir(parents=True, exist_ok=True)
 
-    train_df[:15000].to_feather(dump_path / 'train_seq.feather', )
-    old_train_df[:12000].to_feather(dump_path / 'old_train_seq.feather', )
-    test_df[:25000].to_feather(dump_path / 'test_seq.feather', )
+    train_df.to_feather(dump_path / 'train_seq.feather', )
+    old_train_df.to_feather(dump_path / 'old_train_seq.feather', )
+    test_df.to_feather(dump_path / 'test_seq.feather', )
 

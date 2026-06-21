@@ -5,10 +5,39 @@ import yaml
 
 # Список всех моделей
 models = [
+
+    "lin_cafa5_t5_cafa6-sparse-labels13500_cond.yaml",
+    "lin_cafa5_esm2S1280_cafa6-sparse-labels13500_cond.yaml",
+    "lin_cafa5_t5esm2S1280_cafa6-sparse-labels13500_cond.yaml",
+
     "lin_cafa6_t5_cafa6-sparse-labels13500_cond.yaml",
+    "lin_cafa6_esm2S1280_cafa6-sparse-labels13500_cond.yaml",
+    "lin_cafa6_t5esm2S1280_cafa6-sparse-labels13500_cond.yaml",
+
+    "lin_cafa5_t5_cafa6-sparse-labels13500_raw.yaml",
+    "lin_cafa5_esm2S1280_cafa6-sparse-labels13500_raw.yaml",
+    "lin_cafa5_t5esm2S1280_cafa6-sparse-labels13500_raw.yaml",
+
     "lin_cafa6_t5_cafa6-sparse-labels13500_raw.yaml",
+    "lin_cafa6_esm2S1280_cafa6-sparse-labels13500_raw.yaml",
+    "lin_cafa6_t5esm2S1280_cafa6-sparse-labels13500_raw.yaml",
+
+    "pb_cafa5_t5_cafa6-sparse-labels4500_cond.yaml",
     "pb_cafa5_esm2S1280_cafa6-sparse-labels4500_cond.yaml",
+    "pb_cafa5_t5esm2S1280_cafa6-sparse-labels4500_cond.yaml",
+
+    "pb_cafa6_t5_cafa6-sparse-labels4500_cond.yaml",
+    "pb_cafa6_esm2S1280_cafa6-sparse-labels4500_cond.yaml",
+    "pb_cafa6_t5esm2S1280_cafa6-sparse-labels4500_cond.yaml",
+
+    "pb_cafa5_t5_cafa6-sparse-labels4500_raw.yaml",
     "pb_cafa5_esm2S1280_cafa6-sparse-labels4500_raw.yaml",
+    "pb_cafa5_t5esm2S1280_cafa6-sparse-labels4500_raw.yaml",
+
+    "pb_cafa6_t5_cafa6-sparse-labels4500_raw.yaml",
+    "pb_cafa6_esm2S1280_cafa6-sparse-labels4500_raw.yaml",
+    "pb_cafa6_t5esm2S1280_cafa6-sparse-labels4500_raw.yaml",
+
 ]
 
 # Определение префиксов и суффиксов
@@ -45,7 +74,7 @@ def aggregate_file(models_list, file_name, output_path):
             
             # Агрегируем: группируем по EntryID, суммируем, делим на 6 и приводим к int
             aggregated = combined.group_by('EntryID').agg([
-                (pl.col(col).sum() / 1).cast(pl.Int32).alias(col) for col in value_cols
+                (pl.col(col).sum() / 6).cast(pl.Int32).alias(col) for col in value_cols
             ])
             
             # Переупорядочиваем колонки: EntryID первая, остальные в алфавитном порядке
@@ -88,7 +117,7 @@ def aggregate_test_folders(models_list, test_output_dir):
                 
                 # Агрегируем: группируем по EntryID, суммируем, делим на 6 и приводим к int
                 aggregated = combined.group_by('EntryID').agg([
-                    (pl.col(col).sum() / 1).cast(pl.Int32).alias(col) for col in value_cols
+                    (pl.col(col).sum() / 6).cast(pl.Int32).alias(col) for col in value_cols
                 ])
                 
                 # Переупорядочиваем колонки: EntryID первая, остальные в алфавитном порядке
