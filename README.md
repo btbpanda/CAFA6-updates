@@ -53,9 +53,8 @@ You can also run data and model steps separately by executing `./get_data.sh` an
 `docker build -t kaggle-cafa6-2nd-place-solution .`
 
 # Run docker image
-
-`
+```
 docker run --rm --gpus all \
     -v "$PWD/output:/workspace/output" \
     kaggle-cafa6-2nd-place-solution
-`
+```
