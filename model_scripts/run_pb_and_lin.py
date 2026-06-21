@@ -21,18 +21,22 @@ from joblib import Parallel, delayed
 LIN_CONFIGS = [
     # '/kaggle/working/CAFA6-updates/configs/lin_debug.yaml',  # single config to debug
     # tasks based on T5/ESM embeddings
-    "lin_cafa5_t5_cafa6-sparse-labels13500_cond.yaml",
-    "lin_cafa5_esm2S1280_cafa6-sparse-labels13500_cond.yaml",
-    "lin_cafa5_t5esm2S1280_cafa6-sparse-labels13500_cond.yaml",
+
+    # "lin_cafa5_t5_cafa6-sparse-labels13500_cond.yaml",
+    # "lin_cafa5_esm2S1280_cafa6-sparse-labels13500_cond.yaml",
+    # "lin_cafa5_t5esm2S1280_cafa6-sparse-labels13500_cond.yaml",
+
     "lin_cafa6_t5_cafa6-sparse-labels13500_cond.yaml",
-    "lin_cafa6_esm2S1280_cafa6-sparse-labels13500_cond.yaml",
-    "lin_cafa6_t5esm2S1280_cafa6-sparse-labels13500_cond.yaml",
-    "lin_cafa5_t5_cafa6-sparse-labels13500_raw.yaml",
-    "lin_cafa5_esm2S1280_cafa6-sparse-labels13500_raw.yaml",
-    "lin_cafa5_t5esm2S1280_cafa6-sparse-labels13500_raw.yaml",
+    # "lin_cafa6_esm2S1280_cafa6-sparse-labels13500_cond.yaml",
+    # "lin_cafa6_t5esm2S1280_cafa6-sparse-labels13500_cond.yaml",
+
+    # "lin_cafa5_t5_cafa6-sparse-labels13500_raw.yaml",
+    # "lin_cafa5_esm2S1280_cafa6-sparse-labels13500_raw.yaml",
+    # "lin_cafa5_t5esm2S1280_cafa6-sparse-labels13500_raw.yaml",
+
     "lin_cafa6_t5_cafa6-sparse-labels13500_raw.yaml",
-    "lin_cafa6_esm2S1280_cafa6-sparse-labels13500_raw.yaml",
-    "lin_cafa6_t5esm2S1280_cafa6-sparse-labels13500_raw.yaml",
+    # "lin_cafa6_esm2S1280_cafa6-sparse-labels13500_raw.yaml",
+    # "lin_cafa6_t5esm2S1280_cafa6-sparse-labels13500_raw.yaml",
 
     # tasks based on SVD cross embeddings
     'lin_cafa6_svd512bpsvd512mf_cafa6-sparse-labels_raw.yaml',
@@ -47,18 +51,22 @@ LIN_CONFIGS = [
 PB_CONFIGS = [
     # '/kaggle/working/CAFA6-updates/configs/pb_debug.yaml', # single config to debug
     # tasks based on T5/ESM embeddings
-    "pb_cafa5_t5_cafa6-sparse-labels4500_cond.yaml",
+
+    # "pb_cafa5_t5_cafa6-sparse-labels4500_cond.yaml",
     "pb_cafa5_esm2S1280_cafa6-sparse-labels4500_cond.yaml",
-    "pb_cafa5_t5esm2S1280_cafa6-sparse-labels4500_cond.yaml",
-    "pb_cafa6_t5_cafa6-sparse-labels4500_cond.yaml",
-    "pb_cafa6_esm2S1280_cafa6-sparse-labels4500_cond.yaml",
-    "pb_cafa6_t5esm2S1280_cafa6-sparse-labels4500_cond.yaml",
-    "pb_cafa5_t5_cafa6-sparse-labels4500_raw.yaml",
+    # "pb_cafa5_t5esm2S1280_cafa6-sparse-labels4500_cond.yaml",
+
+    # "pb_cafa6_t5_cafa6-sparse-labels4500_cond.yaml",
+    # "pb_cafa6_esm2S1280_cafa6-sparse-labels4500_cond.yaml",
+    # "pb_cafa6_t5esm2S1280_cafa6-sparse-labels4500_cond.yaml",
+
+    # "pb_cafa5_t5_cafa6-sparse-labels4500_raw.yaml",
     "pb_cafa5_esm2S1280_cafa6-sparse-labels4500_raw.yaml",
-    "pb_cafa5_t5esm2S1280_cafa6-sparse-labels4500_raw.yaml",
-    "pb_cafa6_t5_cafa6-sparse-labels4500_raw.yaml",
-    "pb_cafa6_esm2S1280_cafa6-sparse-labels4500_raw.yaml",
-    "pb_cafa6_t5esm2S1280_cafa6-sparse-labels4500_raw.yaml",
+    # "pb_cafa5_t5esm2S1280_cafa6-sparse-labels4500_raw.yaml",
+
+    # "pb_cafa6_t5_cafa6-sparse-labels4500_raw.yaml",
+    # "pb_cafa6_esm2S1280_cafa6-sparse-labels4500_raw.yaml",
+    # "pb_cafa6_t5esm2S1280_cafa6-sparse-labels4500_raw.yaml",
 
     # tasks based on SVD cross embeddings
     'pb_cafa6_svd512mfsvd512cc_cafa6-sparse-labels_raw.yaml',

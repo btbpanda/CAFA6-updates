@@ -43,7 +43,7 @@ train_data: cafa6
 train_labels: cafa6-sparse-labels
 train_params:
   n_folds: 5
-  epochs: 30
+  epochs: 1
   batch_size: 128
   learning_rate: 0.001
   weight_decay: 0.0003

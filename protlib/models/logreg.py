@@ -5,7 +5,7 @@ import tqdm
 
 class LogRegMultilabel:
 
-    def __init__(self, alpha=0.001, max_iter=20, lr=1, tol=1e-5, output_batch=100, intercept_scaling=1):
+    def __init__(self, alpha=0.001, max_iter=1, lr=1, tol=1e-5, output_batch=100, intercept_scaling=1):
 
         self.alpha = alpha
         self.max_iter = max_iter
