@@ -48,7 +48,7 @@ if __name__ == '__main__':
     """
     subprocess.run(task, shell=True)
 
-    task = f"""!{RAPIDS_ENV} ./protlib/scripts/prop_tsv_sum.py \
+    task = f"""{RAPIDS_ENV} ./protlib/scripts/prop_tsv_sum.py \
         --path {features_path / 'test_auto228.tsv'} \
         --graph {graph_path} \
         --output {uni_codes_path / 'test_auto228.tsv'} \
@@ -70,7 +70,7 @@ if __name__ == '__main__':
 
         print(outp, )
 
-        task = f"""{RAPIDS_ENV} ./CAFA6-updates/protlib/scripts/prop_tsv_sum.py \
+        task = f"""{RAPIDS_ENV} ./protlib/scripts/prop_tsv_sum.py \
             --path {inp} \
             --graph {graph_path} \
             --output {outp} \
