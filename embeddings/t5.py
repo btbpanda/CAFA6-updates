@@ -19,7 +19,7 @@ parser.add_argument('-d', '--device', type=str)
 def get_embeddings(model, tokenizer, seq):
     sequence_examples = [" ".join(list(re.sub(r"[UZOB]", "X", seq)))]
 
-    ids = tokenizer.batch_encode_plus(
+    ids = tokenizer(
         sequence_examples, return_tensors="pt", padding=True, truncation=True, max_length=1000
     )
 
