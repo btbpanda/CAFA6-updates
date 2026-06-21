@@ -69,7 +69,7 @@ if __name__ == '__main__':
             ))
 
         target = pl.read_parquet(
-            list(
+            sorted(
                 helpers_path.glob(f'cafa6-sparse-labels/{G.namespace}/part_*.parquet')
             ),
             columns=columns
@@ -88,7 +88,7 @@ if __name__ == '__main__':
         print('Predict train ', G.namespace)
 
         target = pl.read_parquet(
-            list(
+            sorted(
                 helpers_path.glob(f'cafa6-sparse-labels/{G.namespace}/part_*.parquet')
             ),
             columns=['EntryID'] + columns
@@ -110,7 +110,7 @@ if __name__ == '__main__':
         print('Predict old train ', G.namespace)
 
         target = pl.read_parquet(
-            list(
+            sorted(
                 helpers_path.glob(f'uniprot-old-sparse-labels/{G.namespace}/part_*.parquet')
             ),
             columns=['EntryID'] + columns
