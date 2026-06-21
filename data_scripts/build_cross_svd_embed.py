@@ -72,7 +72,7 @@ if __name__ == '__main__':
             sorted(
                 helpers_path.glob(f'cafa6-sparse-labels/{G.namespace}/part_*.parquet')
             ),
-            columns=columns
+            columns=columns, use_pyarrow=True
         ).filter(
             pl.col(root) == 1
         ).with_columns(
@@ -91,7 +91,7 @@ if __name__ == '__main__':
             sorted(
                 helpers_path.glob(f'cafa6-sparse-labels/{G.namespace}/part_*.parquet')
             ),
-            columns=['EntryID'] + columns
+            columns=['EntryID'] + columns, use_pyarrow=True
         ).with_columns(
             pl.all().fill_null(0)
         )
@@ -113,7 +113,7 @@ if __name__ == '__main__':
             sorted(
                 helpers_path.glob(f'uniprot-old-sparse-labels/{G.namespace}/part_*.parquet')
             ),
-            columns=['EntryID'] + columns
+            columns=['EntryID'] + columns, use_pyarrow=True
         ).with_columns(
             pl.all().fill_null(0)
         )
