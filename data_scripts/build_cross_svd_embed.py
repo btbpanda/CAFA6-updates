@@ -12,6 +12,8 @@ import numpy as np
 import polars as pl
 import pandas as pd
 
+print(pl.__version__)
+
 
 FREQ_CO = 5
 
