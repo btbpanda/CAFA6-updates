@@ -39,7 +39,7 @@ if __name__ == '__main__':
     for ns, terms_dict in obo_parser(graph_path).items():
         ontologies.append(Graph(ns, terms_dict, None, True))
 
-    train_terms = pd.read_csv(cafa6_path / 'train_terms.tsv', sep='\t')
+    train_terms = pd.read_csv(cafa6_path / 'Train/train_terms.tsv', sep='\t')
     vc = train_terms['term'].value_counts()
 
     for G in ontologies:
