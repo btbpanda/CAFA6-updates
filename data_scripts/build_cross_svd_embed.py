@@ -44,6 +44,8 @@ if __name__ == '__main__':
 
     for G in ontologies:
 
+        print('Fitting ', G.namespace)
+
         alias = ''.join(map(lambda x: x[0], G.namespace.split('_')))
         ont_embed_path = embed_path / f'svd512{alias}'
         ont_embed_path.mkdir(parents=True, exist_ok=True)
@@ -77,6 +79,7 @@ if __name__ == '__main__':
         # -----------------------------------
         # Predict on train
         # -----------------------------------
+        print('Predict train ', G.namespace)
 
         target = pl.read_parquet(
             list(
@@ -98,6 +101,7 @@ if __name__ == '__main__':
         # -----------------------------------
         # Predict on old train
         # -----------------------------------
+        print('Predict old train ', G.namespace)
 
         target = pl.read_parquet(
             list(
@@ -120,6 +124,7 @@ if __name__ == '__main__':
         # -----------------------------------
         # Predict on test - just collect train + old train and fill with 0 the rest
         # -----------------------------------
+        print('Predict test ', G.namespace)
 
         test = pl.from_pandas(
             pd.read_feather(
