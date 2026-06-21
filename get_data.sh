@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # download contents
-python ./data_scipts/download.py
+python ./data_scripts/download.py
 # create train / old_train / test
 python ./data_scripts/parse_fasta.py
 # create goa 226/228 parquets
