@@ -4,7 +4,7 @@ Here are the instructions to reproduce the CAFA6 2nd solution using given code
 
 # CONTENTS
 
-* `embeddings`                 : scripts for training Neural Network base models
+* `embeddings`                 : scripts for DL embeddings inference
 * `protlib`                    : utils and code to train Py-Boost and LogReg models, data preprocessing and efficient metric computation
 * `protnn`                     : utils and code to train GCN stacker model
 * `articles`                   : tools for download and extract articles features
