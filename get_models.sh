@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Inference DL embeddings
-python ./model_scripts/run_embeddings_inference.py
+python ./model_scripts/run_embeds_inference.py
 
 # run base models
 python ./model_scripts/run_pb_and_lin.py
