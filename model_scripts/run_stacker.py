@@ -22,8 +22,8 @@ if __name__ == '__main__':
     cafa6_target = cafa6_path / 'Train/train_terms.tsv'
     graph_path = cafa6_path / 'Train/go-basic.obo'
     ia_path = cafa6_path / 'IA.tsv'
-    sparse_target = data_path / '/helpers/cafa6-sparse-labels/'
-    old_sparse_target = data_path / '/helpers/uniprot-old-sparse-labels/'
+    sparse_target = data_path / 'helpers/cafa6-sparse-labels/'
+    old_sparse_target = data_path / 'helpers/uniprot-old-sparse-labels/'
     fasta_path = data_path / 'helpers/fasta'
     uniprot_raw_test_path = data_path / 'uniprot/raw/test'
 
