@@ -2,7 +2,7 @@ pyyaml
 kaggle
 tqdm
 pyarrow
-py-boost==0.5.1
+py-boost==0.5.2
 polars
 Bio
 s3fs
