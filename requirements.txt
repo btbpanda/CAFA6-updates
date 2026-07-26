@@ -14,3 +14,4 @@ torchmetrics
 torchsummary
 sentencepiece
 psutil
+accelerate
