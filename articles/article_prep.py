@@ -76,18 +76,25 @@ def load_data(data_path, args, ):
 
 def preprocess_data(train_df, old_train_df, test_df):
     """Handles missing values, combines text, and removes duplicates."""
-    print("\n  Processing missing values...")
-    for df in [train_df, old_train_df, test_df]:
-        df = df.with_columns([
-            pl.col("Title").fill_null(""),
-            pl.col("Abstract").fill_null("")
-        ])
+    train_df = train_df.with_columns(
+        pl.col("Title").fill_null(""),
+        pl.col("Abstract").fill_null("")
+    )
+
+    old_train_df = old_train_df.with_columns(
+        pl.col("Title").fill_null(""),
+        pl.col("Abstract").fill_null("")
+    )
+
+    test_df = test_df.with_columns(
+        pl.col("Title").fill_null(""),
+        pl.col("Abstract").fill_null("")
+    )
 
     print("  Combining Title and Abstract...")
-    for df in [train_df, old_train_df, test_df]:
-        df = df.with_columns(
-            (pl.col("Title") + " " + pl.col("Abstract")).alias("full_text")
-        )
+    train_df = train_df.with_columns((pl.col("Title") + " " + pl.col("Abstract")).alias("full_text"))
+    old_train_df = old_train_df.with_columns((pl.col("Title") + " " + pl.col("Abstract")).alias("full_text"))
+    test_df = test_df.with_columns((pl.col("Title") + " " + pl.col("Abstract")).alias("full_text"))
 
     print("  Removing duplicates based on PMID...")
     train_df = train_df.unique(subset=["PMID"])
