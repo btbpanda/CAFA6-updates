@@ -46,7 +46,7 @@ python ./articles/article_prep.py \
     --train-abstracts train_final_abstracts.csv \
     --old-train-abstracts old_train_final_abstracts.csv \
     --test-abstracts test_final_abstracts.csv \
-    --test-protein-ids test_uniprot_ids.txt \
+    --test-protein-ids test_ids.txt \
     --train-seq ./helpers/fasta/train_seq.feather \
     --old-train-seq ./helpers/fasta/old_train_seq.feather \
     --test-seq ./helpers/fasta/test_seq.feather \
