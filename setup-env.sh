@@ -8,6 +8,6 @@ conda create -n rapids-26.06 -c rapidsai -c conda-forge \
     rapids=26.06 python=3.12 'cuda-version>=12.2,<=12.9' \
     'pytorch=*=*cuda*' --solver=libmamba
 
-conda activate rapids=26.06
+conda activate rapids-26.06
 
 pip install -r requirements.txt

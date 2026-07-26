@@ -77,7 +77,7 @@ PB_CONFIGS = [
     'pb_cafa6_svd512bpsvd512cc_cafa6-sparse-labels_cond.yaml',
 
     # tasks based on T5+tfidf
-    'pb_cafa6_t5tfidf_uniprot-sparse-labels4500_raw.yaml',
+    'pb_cafa6_t5tfidf_cafa6-sparse-labels4500_raw.yaml', # changed to correct path
 ]
 
 NN_CONFIGS = [
@@ -173,7 +173,7 @@ if __name__ == '__main__':
     # nn models
     nn_template = f'{RAPIDS_ENV} ./protlib/scripts/train_nn.py ' + params_row + ' --fold-id {f} --config {c}'
     TASKS.extend(
-        task_template.format(f=f, c=configs_path / c) for f, c in product(range(5), NN_CONFIGS)
+        nn_template.format(f=f, c=configs_path / c) for f, c in product(range(5), NN_CONFIGS)
     )
     # -----------------------------------
     # Get a rest for a few days ..

@@ -176,6 +176,7 @@ if __name__ == '__main__':
 
             model_names = cfg['tta'][tta_cfg]
             print(f"Using models: {model_names}")
+            model_names = [os.path.join(args.models_path, x) for x in model_names]
 
             # Get partitions from first prediction
             partitions = sorted(

@@ -70,5 +70,5 @@ if __name__ == '__main__':
         ids.append(seq_id)
         embeds[i] = get_embeddings(model, tokenizer, str(seq)).detach().cpu().numpy()
 
-    np.save(output_path / (args.file + '_embed.npy'), embeds)
+    np.save(output_path / (args.file + '_embeds.npy'), embeds)
     np.save(output_path / (args.file + '_ids.npy'), np.array(ids))

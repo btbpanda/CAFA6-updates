@@ -35,28 +35,28 @@ train_params:
   embed_size: 8
 
 models:
-  - ./models_228/lin_13500_cond_v2
-  - ./models_228/pb_4500_cond_v2
-  - ./models_228/lin_13500_raw_v2
-  - ./models_228/pb_4500_raw_v2
-  - ./models_228/nn_cafa6_t5esm2S1280_cafa6-sparse-labels13500_cond
-  - ./models_228/nn_cafa6_t5esm2S1280_cafa6-sparse-labels13500_raw
-  - ./models_228/lin_cafa6_svd512mfsvd512cc_cafa6-sparse-labels_cond_v3
-  - ./models_228/lin_cafa6_svd512mfsvd512cc_cafa6-sparse-labels_raw_v3
-  - ./models_228/pb_cafa6_svd512mfsvd512cc_cafa6-sparse-labels_raw_v3
-  - ./models_228/pb_cafa6_svd512mfsvd512cc_cafa6-sparse-labels_cond_v3
-  - ./models_228/pb_cafa6_t5tfidf_cafa6-sparse-labels4500_raw_v2
+  - lin_13500_cond_v2
+  - pb_4500_cond_v2
+  - lin_13500_raw_v2
+  - pb_4500_raw_v2
+  - nn_cafa6_t5esm2S1280_cafa6-sparse-labels13500_cond
+  - nn_cafa6_t5esm2S1280_cafa6-sparse-labels13500_raw
+  - lin_cafa6_svd512mfsvd512cc_cafa6-sparse-labels_cond_v3
+  - lin_cafa6_svd512mfsvd512cc_cafa6-sparse-labels_raw_v3
+  - pb_cafa6_svd512mfsvd512cc_cafa6-sparse-labels_raw_v3
+  - pb_cafa6_svd512mfsvd512cc_cafa6-sparse-labels_cond_v3
+  - pb_cafa6_t5tfidf_cafa6-sparse-labels4500_raw_v2
 
 tta:
   cfg0:
-    - ./models_228/lin_13500_cond_v2
-    - ./models_228/pb_4500_cond_v2
-    - ./models_228/lin_13500_raw_v2
-    - ./models_228/pb_4500_raw_v2
-    - ./models_228/nn_cafa6_t5esm2S1280_cafa6-sparse-labels13500_cond
-    - ./models_228/nn_cafa6_t5esm2S1280_cafa6-sparse-labels13500_raw
-    - ./models_228/lin_cafa6_svd512mfsvd512cc_cafa6-sparse-labels_cond_v3
-    - ./models_228/lin_cafa6_svd512mfsvd512cc_cafa6-sparse-labels_raw_v3
-    - ./models_228/pb_cafa6_svd512mfsvd512cc_cafa6-sparse-labels_raw_v3
-    - ./models_228/pb_cafa6_svd512mfsvd512cc_cafa6-sparse-labels_cond_v3
-    - ./models_228/pb_cafa6_t5tfidf_cafa6-sparse-labels4500_raw_v2
+    - lin_13500_cond_v2
+    - pb_4500_cond_v2
+    - lin_13500_raw_v2
+    - pb_4500_raw_v2
+    - nn_cafa6_t5esm2S1280_cafa6-sparse-labels13500_cond
+    - nn_cafa6_t5esm2S1280_cafa6-sparse-labels13500_raw
+    - lin_cafa6_svd512mfsvd512cc_cafa6-sparse-labels_cond_v3
+    - lin_cafa6_svd512mfsvd512cc_cafa6-sparse-labels_raw_v3
+    - pb_cafa6_svd512mfsvd512cc_cafa6-sparse-labels_raw_v3
+    - pb_cafa6_svd512mfsvd512cc_cafa6-sparse-labels_cond_v3
+    - pb_cafa6_t5tfidf_cafa6-sparse-labels4500_raw_v2
