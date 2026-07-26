@@ -1,9 +1,9 @@
 
 email: admin@university.edu # Email for NCBI registration (required for API usage).
 # artifacts paths. Pls put absolute path here
-data_path: /Users/btbpanda/data/cafa6_data # path to input data
-embed_path: /Users/btbpanda/data/cafa6_embeds
-models_path: /Users/btbpanda/data/cafa6_models
+data_path: /workspace/data/cafa6_data # path to input data
+embed_path: /workspace/data/cafa6_embeds
+models_path: /workspace/data/cafa6_models
 
 devices:
   - 0
